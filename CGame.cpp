@@ -61,7 +61,7 @@ BOOL CGame::Init(HINSTANCE hinst) {
 	// ウインドウ生成
 	win.SetWindowStyle(WS_OVERLAPPEDWINDOW);					// 枠無しウインドウ(フルスクリーン時はWS_POPUPのみ、ウィンドウモード時はさらにWS_CAPTION|WS_SYSMENUなどを付ける)
 	win.SetIcon(MAKEINTRESOURCEW(IDI_ICON1));		// アイコン設定
-	if (!win.Create(hinst, L"MUSIC GAME", 1, 1280, 720)) {	// ウィンドウサイズは1280*720
+	if (!win.Create(hinst, L"Amaoto", 1, 1280, 720)) {	// ウィンドウサイズは1280*720
 		DEBUG("Window create error\n");
 		return FALSE;
 	}
