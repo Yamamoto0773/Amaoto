@@ -162,10 +162,10 @@ BOOL CGame::Init(HINSTANCE hinst) {
 
 
 	// 判定ライン
-	dd.SetPutRange(TEX_JUDGELINE, TEXFILE_IMAGE0, 37, 991, 1826, 15);
+	dd.SetPutRange(TEX_JUDGELINE, TEXFILE_IMAGE0, 0, 992, 1940, 15);
 
 	// 判定ラインのエフェクト
-	dd.SetPutRange(TEX_JUDGELINEEFFECT, TEXFILE_IMAGE0, 17, 899, 1864, 76);
+	dd.SetPutRange(TEX_JUDGELINEEFFECT, TEXFILE_IMAGE0, 0, 899, 1940, 76);
 
 	//// ノートレーン
 	//dd.SetPutRange(2, 0, 72, 838, 1768, 8);
