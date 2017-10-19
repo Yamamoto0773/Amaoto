@@ -1199,7 +1199,7 @@ int CGame::RunPlayMusicMode(LONG musicID, BOOL demo) {
 	for (int i=0; i<VIRTUALKEYCNT; i++) {
 		if (bOnVirtualKey[i]) {
 			dd.SetPutStatus(TEX_BUTTONEFFECT, 1.0f, 0.9f, 0.0f);
-			dd.Put2(TEX_BUTTONEFFECT, 200+i*1520/VIRTUALKEYCNT, 888);
+			dd.Put2(TEX_BUTTONEFFECT, i*1920/(VIRTUALKEYCNT-1), 888);
 		}
 	}
 
