@@ -4,7 +4,6 @@
 // CGame : ゲームメインルーチン v2.00
 // ・Win10動作確認済み
 ////////////////////////////////////////////////////////////////////////////
-#include <Windows.h>
 #include "./libfiles/CDDPro90.h"
 #include "./libfiles/CDSPro81.h"
 #include "./libfiles/CDIPro81.h"
@@ -137,13 +136,13 @@ class CGame {
 	CTimer			tm;					// 60FPS処理
 	CBmsPro			bms[MAXMUSICCNT];	// BMSファイル管理用
 
-	BOOL			bLostDevice;		// D3Dデバイスロスト状態フラグ
+	bool			bLostDevice;		// D3Dデバイスロスト状態フラグ
 
 	// ゲームのメイン処理で使用する変数
 	STATE			eState;				// ゲームのステート状況
 	float			fScrMulti;			// 小節間の幅の倍率
-	LONGLONG		llStartTime;		// ゲーム開始時の時間(高解像度タイマー)
-	LONGLONG		llGlobalFreq;		// マシンの１秒間のカウント数(高解像度タイマー)
+	long			llStartTime;		// ゲーム開始時の時間(高解像度タイマー)
+	long		llGlobalFreq;		// マシンの１秒間のカウント数(高解像度タイマー)
 	double			dElapsedTime;		// 開始からの経過時間(秒)
 	int				iStartNum[BMS_MAXNOTELANE+BMS_MAXINDEX];		// BMS演奏で計算開始する配列番号(処理を軽くするため)
 	
@@ -155,8 +154,8 @@ class CGame {
 	int				iLoadMusicCnt;			// ロードした曲数
 
 	// 入力状態
-	BOOL			bOnVirtualKey[VIRTUALKEYCNT];		// 仮想入力キーが押されているか
-	LONG			lHoldNote[VIRTUALKEYCNT];			// 現在判定中のHOLDノートID
+	bool			bOnVirtualKey[VIRTUALKEYCNT];		// 仮想入力キーが押されているか
+	long			lHoldNote[VIRTUALKEYCNT];			// 現在判定中のHOLDノートID
 
 	// 演出など
 	int				iNoteEffectIndex[BMS_MAXNOTELANE];		// 次に使用される判定表示エフェクトのインデックス
@@ -164,33 +163,33 @@ class CGame {
 	int				iRippleEffectIndex;						// 波紋エフェクトカウンタのインデックス
 	EFFECTSTATE		iRippleEffectCount[50];					// 波紋エフェクトのカウント
 	int				iBackMediaIndex;	// 現在表示中の背景メディアのインデックス番号
-	BOOL			bIsBackMedia;		// 背景メディアが存在するかのフラグ
-	BOOL			bFlag;				// 何かに使う
+	bool			bIsBackMedia;		// 背景メディアが存在するかのフラグ
+	bool			bFlag;				// 何かに使う
 
 private:
 	// 初期化
-	BOOL Init( HINSTANCE hinst );		// 初期化＆ゲーム形成
-	BOOL Clear( void );					// ロード済みデータの開放
+	bool Init( HINSTANCE hinst );		// 初期化＆ゲーム形成
+	bool Clear( void );					// ロード済みデータの開放
 
 
 	// ゲーム処理
-	BOOL	InitGame();
-	BOOL	InitPlayMusicMode(LONG musicID, DIFFICULTY diffID);							// 演奏モード初期化
-	BOOL	InitTitle();
+	bool	InitGame();
+	bool	InitPlayMusicMode(long musicID, DIFFICULTY diffID);							// 演奏モード初期化
+	bool	InitTitle();
 	int		RunTitle();																	// タイトル画面ループ
-	int		RunPlayMusicMode(LONG musicID, BOOL demo = FALSE);							// 演奏モード実行ループ
-	BOOL	InitMusicSelectionMode();													// 曲選択モード初期化
+	int		RunPlayMusicMode(long musicID, bool demo = FALSE);							// 演奏モード実行ループ
+	bool	InitMusicSelectionMode();													// 曲選択モード初期化
 	int		RunMusicSelectionMode();													// 曲選択モード実行ループ
-	BOOL	InitDifficultySectionMode();												// 難易度選択モード初期化
+	bool	InitDifficultySectionMode();												// 難易度選択モード初期化
 	int		RunDifficultySelectionMode();												// 難易度選択モード実行ループ
-	BOOL	InitResultMode();
+	bool	InitResultMode();
 	int		RunResultMode();
-	BOOL	ExitPlayMusicMode();
-	BOOL	RunScreenTransition(double stime);
-	BOOL	RunLoadingScreen();
+	bool	ExitPlayMusicMode();
+	bool	RunScreenTransition(double stime);
+	bool	RunLoadingScreen();
 
-	BOOL	LoadAllBmsHeader(const char *file);
-	BOOL	InputVirtualKey(BOOL *virtualKey, MIDIKEYSTATE *midiKey, BYTE *keyboard, BOOL IsUseMidi);	// 仮想入力キーへ入力
+	bool	LoadAllBmsHeader(const char *file);
+	bool	InputVirtualKey(bool *virtualKey, MIDIKEYSTATE *midiKey, unsigned char *keyboard, bool IsUseMidi);	// 仮想入力キーへ入力
 
 
 private:
@@ -201,7 +200,7 @@ public:
 	CGame();
 	virtual ~CGame();
 	
-	BOOL Run( HINSTANCE hinst );		// ゲームメインルーチン
+	bool Run( HINSTANCE hinst );		// ゲームメインルーチン
 };
 
 
