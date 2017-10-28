@@ -1,6 +1,5 @@
 #include "GameController.hpp"
 
-using namespace std;
 
 GameController::GameController() {
 
@@ -53,7 +52,7 @@ bool GameController::Update() {
 	if (IsValidMidi) {
 		// midiキーボードを使う
 
-		for (int i=0; i<keyCount; i++) {
+		for (int i=0; i<KEYCOUNT; i++) {
 			switch (midiKey[i]) {
 				case MIDIKEYSTATE_PRESSED:
 					bIsKeyPressed[i] = true;
@@ -76,8 +75,8 @@ bool GameController::Update() {
 			DIK_Z, DIK_X, DIK_C, DIK_V, DIK_B, DIK_N, DIK_M, DIK_COMMA, DIK_PERIOD, DIK_SLASH, DIK_BACKSLASH, DIK_RSHIFT, DIK_NUMPAD1, DIK_NUMPAD2, DIK_NUMPAD3,
 		};
 
-		bool on[keyCount];
-		for (int i=0; i<keyCount; i++) {
+		bool on[KEYCOUNT];
+		for (int i=0; i<KEYCOUNT; i++) {
 			on[i] = bIsKeyOn[i];	// バックアップ
 		}
 
@@ -87,7 +86,7 @@ bool GameController::Update() {
 			double x;
 			if (!GetKeyPosition(KEYID[i], 0.0, 0.99, &x)) continue;
 
-			int virKeyNum = (int)(x*keyCount);		// 仮想キーの位置に変換
+			int virKeyNum = (int)(x*KEYCOUNT);		// 仮想キーの位置に変換
 
 			if (keyboard[KEYID[i]]&0x80) {
 				bIsKeyOn[virKeyNum] = true;
@@ -105,19 +104,20 @@ bool GameController::Update() {
 	return true;
 }
 
-void GameController::GetKeyState(bool* &hold, bool* &pressed) {
-	hold	= bIsKeyOn;
-	pressed	= bIsKeyPressed;
+void GameController::GetKeyState(bool* hold, bool* pressed) {
+
+	memcpy(hold, bIsKeyOn, sizeof(bool)*KEYCOUNT);
+	memcpy(pressed, bIsKeyPressed, sizeof(bool)*KEYCOUNT);
 }
 
 const bool GameController::IsKeyOn(int num) const {
-	if (num < 0 || num >= keyCount)	return false;
+	if (num < 0 || num >= KEYCOUNT)	return false;
 
 	return bIsKeyOn[num];
 }
 
 const bool GameController::IsKeyPressed(int num) const {
-	if (num < 0 || num >= keyCount)	return false;
+	if (num < 0 || num >= KEYCOUNT)	return false;
 
 	return bIsKeyPressed[num];
 }
