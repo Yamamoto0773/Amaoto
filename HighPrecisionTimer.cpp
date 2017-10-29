@@ -1,4 +1,4 @@
-#include "HighPrecisionTimer.h"
+#include "HighPrecisionTimer.hpp"
 
 HighPrecisionTimer::HighPrecisionTimer() {
 	llStartCount.QuadPart = 0;

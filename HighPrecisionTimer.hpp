@@ -40,6 +40,9 @@ public:
 	// 高精度タイマーが有効かどうかを返す
 	bool IsHighPrecisionValid() { return bIsHighPrecValid; }
 
+	// タイマーの分解能を返す
+	long long GetResolutionFreq() { return llFrequency.QuadPart; }
+
 	// タイマーをスタート
 	void Start();
 
