@@ -20,6 +20,7 @@ HighPrecisionTimer::HighPrecisionTimer() {
 		*/
 
 		llFrequency.QuadPart = 1000LL;
+		bIsHighPrecValid = false;
 	}
 
 }
