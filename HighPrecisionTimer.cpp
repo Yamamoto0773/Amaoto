@@ -22,7 +22,6 @@ HighPrecisionTimer::HighPrecisionTimer() {
 		llFrequency.QuadPart = 1000LL;
 		bIsHighPrecValid = false;
 	}
-
 }
 
 
@@ -53,7 +52,6 @@ void HighPrecisionTimer::Start() {
 			// ˆêŽž’âŽ~‚µ‚½ŽžŠÔ•ª‚¾‚¯‚¸‚ç‚·
 			llStartCount.QuadPart += now.QuadPart - llPauseStCount.QuadPart;
 		}
-		
 
 		bIsPaused = false;
 		bIsReset = false;
@@ -84,9 +82,8 @@ void HighPrecisionTimer::Pause() {
 		// ˆêŽž’âŽ~Žž‚Ìƒ^ƒCƒ€‚ð•Û‘¶
 		dTime = (double)(llPauseStCount.QuadPart - llStartCount.QuadPart)/llFrequency.QuadPart;
 
+		bIsPaused = true;
 	}
-
-	bIsPaused = true;
 
 }
 
@@ -95,7 +92,6 @@ void HighPrecisionTimer::Reset() {
 
 	if (bIsPaused) {
 		dTime = 0.0;
-
 		bIsReset = true;
 	}
 	else {

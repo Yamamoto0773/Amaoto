@@ -5,16 +5,14 @@ HighPrecisionTimerクラス
 
 概要:時間を高精度(1ms以下)で測定することができるクラスです。
 
-実際のストップウォッチ同じ挙動をするように、プログラムを設計しました。
-関数の呼び出しも、ストップウォッチと同じように行って下さい。
+実際のストップウォッチと同じ挙動をするようにプログラムを設計しました。
+関数の呼び出しもストップウォッチと同じように行って下さい。
 
 
 作成者:山本七海
 作成日時:2017/10/29
 参考:http://www.charatsoft.com/develop/otogema/
-
 */
-
 
 
 #include <Windows.h>
@@ -25,7 +23,7 @@ private:
 
 	LARGE_INTEGER llStartCount;
 	LARGE_INTEGER llPauseStCount;
-	
+
 	double dTime;
 
 	bool bIsHighPrecValid;
