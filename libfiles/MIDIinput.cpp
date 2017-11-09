@@ -1,4 +1,4 @@
-#include "MIDIinput.h"
+ï»¿#include "MIDIinput.h"
 
 
 unsigned int  MIDIInput::iWriteMsgByte = 0;
@@ -46,16 +46,16 @@ void CALLBACK MIDIInput::MidiInProc(HMIDIIN hMidiInHandle, UINT wMsg, DWORD dwIn
 			bool is_pressed = velocity != 0;
 			unsigned char note = ( dwParam1 & 0x0000ff00 ) >> 8;
 
-			// c4 - c6 ‚Ü‚Å
+			// c4 - c6 ã¾ã§
 			if (note < 48 || note > 72) break;
 
 			switch (statusByte) {
-				case 0x90:	// ƒm[ƒgƒIƒ“
+				case 0x90:	// ãƒãƒ¼ãƒˆã‚ªãƒ³
 					eKeyState[note-48] = MIDIKEYSTATE_PRESSED;
 					WriteMsgBuffer(iWriteMsgByte, mMsgBuffer, "MIM_DATA: wMsg=%08X, p1=%08X, p2=%08X\n"
 						"<NOTE ON> note = %u, velocity = %u\n", wMsg, dwParam1, dwParam2, note, velocity);
 					break;
-				case 0x80:	// ƒm[ƒgƒIƒt
+				case 0x80:	// ãƒãƒ¼ãƒˆã‚ªãƒ•
 					eKeyState[note-48] = MIDIKEYSTATE_RELEASED;
 					WriteMsgBuffer(iWriteMsgByte, mMsgBuffer, "MIM_DATA: wMsg=%08X, p1=%08X, p2=%08X\n"
 						"<NOTE OFF>note = %u, velocity = %u\n", wMsg, dwParam1, dwParam2, note, velocity);
@@ -82,7 +82,7 @@ int MIDIInput::WriteMsgBuffer(unsigned int &writeTotalByte, CHAR *buffer, CONST 
 	if (format			== NULL) return -1;
 	if (writeTotalByte > MSGBUFFERSIZE) return -1;
 
-	// ‘O‰ñ‘‚«‚ñ‚¾NULL•¶š‚Æ“¯‚¶ˆÊ’u‚ÉA‘‚«‚Ş	¦NULL•¶š‚ğã‘‚«‚·‚é
+	// å‰å›æ›¸ãè¾¼ã‚“ã NULLæ–‡å­—ã¨åŒã˜ä½ç½®ã«ã€æ›¸ãè¾¼ã‚€	â€»NULLæ–‡å­—ã‚’ä¸Šæ›¸ãã™ã‚‹
 	if (writeTotalByte != 0) writeTotalByte--;
 
 	int cnt = 0;
@@ -91,7 +91,7 @@ int MIDIInput::WriteMsgBuffer(unsigned int &writeTotalByte, CHAR *buffer, CONST 
 	cnt = vsnprintf(mMsgBuffer + writeTotalByte, MSGBUFFERSIZE - writeTotalByte, format, list);
 	va_end(list);
 
-	writeTotalByte += cnt+1;	//NULL•¶š‚àƒJƒEƒ“ƒg
+	writeTotalByte += cnt+1;	//NULLæ–‡å­—ã‚‚ã‚«ã‚¦ãƒ³ãƒˆ
 
 	return cnt;
 }

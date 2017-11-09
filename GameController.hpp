@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 
 #include "libfiles/CDIPro81.h"
 #include "libfiles/MIDIinput.h"
 
 
-#define KEYCOUNT 25		// “ü—ÍƒL[‚Ì”
+#define KEYCOUNT 25		// å…¥åŠ›ã‚­ãƒ¼ã®æ•°
 
 class GameController {	
 private:
@@ -16,29 +16,29 @@ private:
 	bool bIsKeyOn[KEYCOUNT];
 	bool bIsKeyPressed[KEYCOUNT];
 	
-	// ƒL[‚ÌˆÊ’u‚ğw’è‚µ‚½’l‚Ì”ÍˆÍ‚Å•Ô‚·
+	// ã‚­ãƒ¼ã®ä½ç½®ã‚’æŒ‡å®šã—ãŸå€¤ã®ç¯„å›²ã§è¿”ã™
 	bool GetKeyPosition(int DIKcode, float min, float max, double *posX=nullptr, double *posY=nullptr);	 
 
 public:
 	GameController();
 	virtual ~GameController();
 
-	// ƒNƒ‰ƒX‚Ì‰Šú‰»
+	// ã‚¯ãƒ©ã‚¹ã®åˆæœŸåŒ–
 	bool Init(HWND hnd, HINSTANCE hInstance);
 
-	// “ü—Íó‘Ô‚ÌXV
+	// å…¥åŠ›çŠ¶æ…‹ã®æ›´æ–°
 	bool Update();
 
-	// “ü—Íó‘Ô‚Ìæ“¾
+	// å…¥åŠ›çŠ¶æ…‹ã®å–å¾—
 	void GetKeyState(bool* hold, bool* pressed);
 
-	// w’è”Ô†‚Ì“ü—ÍƒfƒoƒCƒX(hold)‚Ìó‘Ô‚ğæ“¾
+	// æŒ‡å®šç•ªå·ã®å…¥åŠ›ãƒ‡ãƒã‚¤ã‚¹(hold)ã®çŠ¶æ…‹ã‚’å–å¾—
 	const bool IsKeyOn(int num) const;
 
-	// w’è”Ô†‚Ì“ü—ÍƒfƒoƒCƒX(pressed)‚Ìó‘Ô‚ğæ“¾
+	// æŒ‡å®šç•ªå·ã®å…¥åŠ›ãƒ‡ãƒã‚¤ã‚¹(pressed)ã®çŠ¶æ…‹ã‚’å–å¾—
 	const bool IsKeyPressed(int num) const;
 
-	// Œã•Ğ•t‚¯
+	// å¾Œç‰‡ä»˜ã‘
 	bool Clear();
 	
 };

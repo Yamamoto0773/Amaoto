@@ -1,7 +1,7 @@
-#pragma once
+ï»¿#pragma once
 
 //////////////////////////////////////////////////////////////
-// DirectX9.0‚ğ—p‚¢‚Ä}Œ`‚ğ•`‰æ‚·‚éƒNƒ‰ƒX‚Å‚·
+// DirectX9.0ã‚’ç”¨ã„ã¦å›³å½¢ã‚’æç”»ã™ã‚‹ã‚¯ãƒ©ã‚¹ã§ã™
 //////////////////////////////////////////////////////////////
 
 #pragma comment(lib, "dxguid.lib")
@@ -23,9 +23,9 @@ typedef struct _Point {
 
 
 typedef struct _D3DVERTEX {
-	float x, y, z;	// ’¸“_À•W
-	float rhw;		// œZ”
-	DWORD color;	// ’¸“_‚ÌF
+	float x, y, z;	// é ‚ç‚¹åº§æ¨™
+	float rhw;		// é™¤ç®—æ•°
+	DWORD color;	// é ‚ç‚¹ã®è‰²
 }D3DVERTEX;
 
 #define D3DFVF_2DVERTEX (D3DFVF_XYZRHW | D3DFVF_DIFFUSE)
@@ -41,14 +41,14 @@ private:
 
 	ID3DXLine	*pLine;
 
-	BOOL		bStroke;			// —ÖŠsü‚ğ•`‰æ‚·‚é‚©
-	BOOL		bFill;				// “h‚è‚Â‚Ô‚µ‚ğ‚·‚é‚©
-	BOOL		bAntialias;			// ƒAƒ“ƒ`ƒGƒCƒŠƒAƒX‚ğ‚©‚¯‚é‚©
+	BOOL		bStroke;			// è¼ªéƒ­ç·šã‚’æç”»ã™ã‚‹ã‹
+	BOOL		bFill;				// å¡—ã‚Šã¤ã¶ã—ã‚’ã™ã‚‹ã‹
+	BOOL		bAntialias;			// ã‚¢ãƒ³ãƒã‚¨ã‚¤ãƒªã‚¢ã‚¹ã‚’ã‹ã‘ã‚‹ã‹
 
-	float		fStrokeWeight;		// ü‚Ì‘¾‚³
+	float		fStrokeWeight;		// ç·šã®å¤ªã•
 
-	D3DCOLOR	dwStrokeColor;		// ü‚ÌF
-	D3DCOLOR	dwFillColor;		// “h‚è‚Â‚Ô‚µ‚ÌF
+	D3DCOLOR	dwStrokeColor;		// ç·šã®è‰²
+	D3DCOLOR	dwFillColor;		// å¡—ã‚Šã¤ã¶ã—ã®è‰²
 	
 
 public:
@@ -56,7 +56,7 @@ public:
 	~DirectXFigure();
 
 	
-	BOOL Init(LPDIRECT3DDEVICE9 lpDev);		// ‰Šú‰»
+	BOOL Init(LPDIRECT3DDEVICE9 lpDev);		// åˆæœŸåŒ–
 
 
 	BOOL stroke(int red, int green, int blue, int alpha = 255);

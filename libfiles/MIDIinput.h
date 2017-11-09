@@ -1,13 +1,13 @@
-#pragma once
+ï»¿#pragma once
 
 #pragma warning(disable : 4996)
 
 /////////////////////////////////////////////////////
-// Windows API‚ğg—p‚µ‚ÄMIDIƒL[ƒ{[ƒh‚Ìó‘Ô‚ğæ“¾‚·‚éƒNƒ‰ƒX‚Å‚·
-// Ql@http://puarts.com/?pid=1124
+// Windows APIã‚’ä½¿ç”¨ã—ã¦MIDIã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã®çŠ¶æ…‹ã‚’å–å¾—ã™ã‚‹ã‚¯ãƒ©ã‚¹ã§ã™
+// å‚è€ƒã€€http://puarts.com/?pid=1124
 
-// ì¬Ò@R–{µŠC
-// ì¬“ú@2017/10/11
+// ä½œæˆè€…ã€€å±±æœ¬ä¸ƒæµ·
+// ä½œæˆæ—¥ã€€2017/10/11
 /////////////////////////////////////////////////////
 
 
@@ -33,7 +33,7 @@ class MIDIInput {
 private:
 	HMIDIIN				hMidiInHandle;
 	static CHAR			mMsgBuffer[MSGBUFFERSIZE];
-	static unsigned int	iWriteMsgByte;				// mMsgBuffer‚É‘‚«‚ñ‚¾ƒoƒCƒg”
+	static unsigned int	iWriteMsgByte;				// mMsgBufferã«æ›¸ãè¾¼ã‚“ã ãƒã‚¤ãƒˆæ•°
 	static MIDIKEYSTATE	eKeyState[MIDIKEYCNT];
 
 

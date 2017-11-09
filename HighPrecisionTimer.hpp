@@ -1,17 +1,17 @@
-#pragma once
+﻿#pragma once
 
 /*
-HighPrecisionTimer�N���X
+HighPrecisionTimerクラス
 
-�T�v:���Ԃ������x(1ms�ȉ�)�ő��肷�邱�Ƃ��ł���N���X�ł��B
+概要:時間を高精度(1ms以下)で測定することができるクラスです。
 
-���ۂ̃X�g�b�v�E�H�b�`�Ɠ�������������悤�Ƀv���O������݌v���܂����B
-�֐��̌Ăяo�����X�g�b�v�E�H�b�`�Ɠ����悤�ɍs���ĉ������B
+実際のストップウォッチと同じ挙動をするようにプログラムを設計しました。
+関数の呼び出しもストップウォッチと同じように行って下さい。
 
 
-�쐬��:�R�{���C
-�쐬����:2017/10/29
-�Q�l:http://www.charatsoft.com/develop/otogema/
+作成者:山本七海
+作成日時:2017/10/29
+参考:http://www.charatsoft.com/develop/otogema/
 */
 
 
@@ -35,21 +35,21 @@ public:
 	HighPrecisionTimer();
 	~HighPrecisionTimer();
 
-	// �����x�^�C�}�[���L�����ǂ�����Ԃ�
+	// 高精度タイマーが有効かどうかを返す
 	bool IsHighPrecisionValid() { return bIsHighPrecValid; }
 
-	// �^�C�}�[�̕���\��Ԃ�
+	// タイマーの分解能を返す
 	long long GetResolutionFreq() { return llFrequency.QuadPart; }
 
-	// �^�C�}�[���X�^�[�g
+	// タイマーをスタート
 	void Start();
 
-	// �^�C�}�[���ꎞ��~
+	// タイマーを一時停止
 	void Pause();
 
-	// �^�C�}�[�����Z�b�g
+	// タイマーをリセット
 	void Reset();
 
-	// ���Ԃ��擾
+	// 時間を取得
 	double GetTime();
 };

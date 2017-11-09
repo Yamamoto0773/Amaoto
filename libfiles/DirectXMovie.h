@@ -1,8 +1,8 @@
-/*
-! Qlƒ\[ƒXƒR[ƒh
+ï»¿/*
+! å‚è€ƒã‚½ãƒ¼ã‚¹ã‚³ãƒ¼ãƒ‰
 !
 ! @file movietex.h
-! @bref	ƒ€[ƒr[ƒeƒNƒXƒ`ƒƒƒNƒ‰ƒX
+! @bref	ãƒ ãƒ¼ãƒ“ãƒ¼ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚¯ãƒ©ã‚¹
 ! @author	Masafumi TAKAHASHI
 */
 
@@ -26,7 +26,7 @@
 struct __declspec(uuid("{71771540-2017-11cf-ae26-0020afd79767}")) CLSID_TextureRenderer;
 
 //! @class CMovieTexture 
-//! @brief ƒrƒfƒI‚ğDirect3DTexture9‚É‘‚«‚Şˆ—‚ğs‚¤ƒNƒ‰ƒX
+//! @brief ãƒ“ãƒ‡ã‚ªã‚’Direct3DTexture9ã«æ›¸ãè¾¼ã‚€å‡¦ç†ã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 class CMovieTexture : public CBaseVideoRenderer {
 	CComPtr<IDirect3DDevice9>	m_pd3dDevice;
 	CComPtr<IDirect3DTexture9>	m_pTexture;
@@ -44,28 +44,28 @@ public:
 	HRESULT DoRenderSample(IMediaSample *pMediaSample); // New video sample
 
 														//! @fn IDirect3DTexture9 * GetTexture()
-														//! @brief ƒ€[ƒr[ƒeƒNƒXƒ`ƒƒ‚Ìæ“¾
-														//! @return ƒ€[ƒr[‚ªƒŒƒ“ƒ_ƒŠƒ“ƒO‚³‚ê‚½ƒeƒNƒXƒ`ƒƒ
+														//! @brief ãƒ ãƒ¼ãƒ“ãƒ¼ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å–å¾—
+														//! @return ãƒ ãƒ¼ãƒ“ãƒ¼ãŒãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã•ã‚ŒãŸãƒ†ã‚¯ã‚¹ãƒãƒ£
 	IDirect3DTexture9 * GetTexture() { return m_pTexture; };
 
 	//! @fn VOID GetVideoDesc(LONG* plVidWidth, LONG* plVidHeight, LONG* plVidPitch)
-	//! @brief ƒrƒfƒI‚Ì•A‚‚³Aƒsƒbƒ`‚Ìæ“¾
-	//! @param *plVidWidth (out) ƒrƒfƒI‚Ì•
-	//! @param *plVidHeigh (out) ƒrƒfƒI‚Ì‚
-	//! @param *plVidPitch (out) ƒrƒfƒI‚Ìƒsƒbƒ`
+	//! @brief ãƒ“ãƒ‡ã‚ªã®å¹…ã€é«˜ã•ã€ãƒ”ãƒƒãƒã®å–å¾—
+	//! @param *plVidWidth (out) ãƒ“ãƒ‡ã‚ªã®å¹…
+	//! @param *plVidHeigh (out) ãƒ“ãƒ‡ã‚ªã®é«˜
+	//! @param *plVidPitch (out) ãƒ“ãƒ‡ã‚ªã®ãƒ”ãƒƒãƒ
 	VOID GetVideoDesc(LONG* plVidWidth, LONG* plVidHeight, LONG* plVidPitch) {
 		*plVidWidth = m_lVidWidth;
 		*plVidHeight = m_lVidHeight;
 		*plVidPitch = m_lVidPitch;
 	};
 
-	//! @param ƒ_ƒCƒiƒ~ƒbƒNƒeƒNƒXƒ`ƒƒ‚ğg‚¤‚©‚Ç‚¤‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
+	//! @param ãƒ€ã‚¤ãƒŠãƒŸãƒƒã‚¯ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½¿ã†ã‹ã©ã†ã‹ã©ã†ã‹ã®ãƒ•ãƒ©ã‚°
 	BOOL m_bUseDynamicTextures;
-	//! @param ƒrƒfƒI‚Ì•
+	//! @param ãƒ“ãƒ‡ã‚ªã®å¹…
 	LONG m_lVidWidth;
-	//! @param ƒrƒfƒI‚Ì‚‚³
+	//! @param ãƒ“ãƒ‡ã‚ªã®é«˜ã•
 	LONG m_lVidHeight;
-	//! @param ƒrƒfƒI‚Ìƒsƒbƒ`
+	//! @param ãƒ“ãƒ‡ã‚ªã®ãƒ”ãƒƒãƒ
 	LONG m_lVidPitch;
 };
 
@@ -83,23 +83,23 @@ typedef struct _MOVIEVERTEX {
 } MOVIEVERTEX;
 
 
-// “®‰æ‚ÌˆÊ’u‚ğw’è‚·‚é‚Æ‚«‚Ég‚¤ƒtƒ‰ƒO
+// å‹•ç”»ã®ä½ç½®ã‚’æŒ‡å®šã™ã‚‹ã¨ãã«ä½¿ã†ãƒ•ãƒ©ã‚°
 typedef enum _MOVIEPOSITIONFORMAT {
-	MOVPOSFMT_CENTER,		// “®‰æ‚Ì’†‰›‚ÌÀ•W‚ğw’è
-	MOVPOSFMT_UPPERRIGHT,	// “®‰æ‚Ì‰Eã‚ÌÀ•W‚ğw’è
+	MOVPOSFMT_CENTER,		// å‹•ç”»ã®ä¸­å¤®ã®åº§æ¨™ã‚’æŒ‡å®š
+	MOVPOSFMT_UPPERRIGHT,	// å‹•ç”»ã®å³ä¸Šã®åº§æ¨™ã‚’æŒ‡å®š
 }MOVIEPOSITIONFORMAT;
 
 
-// “®‰æ‚ÌŠg‘åk¬ˆ—‚ğw’è‚·‚é‚Æ‚«‚Ég‚¤ƒtƒ‰ƒO
+// å‹•ç”»ã®æ‹¡å¤§ç¸®å°å‡¦ç†ã‚’æŒ‡å®šã™ã‚‹ã¨ãã«ä½¿ã†ãƒ•ãƒ©ã‚°
 typedef enum _DRAWMOVIEOPTION {
-	DRAWMOVOPT_ASPECTVARI,	// ’ZŒ`—Ìˆæ‚Éˆê’v‚³‚¹‚é‚æ‚¤‚Éc‰¡”ä‚ğ–³‹‚µ‚Ä“®‰æ‚ğŠg‘åk¬
-	DRAWMOVOPT_ASPECTFIXED,	// ’ZŒ`—Ìˆæ‚Éˆê’v‚³‚¹‚é‚æ‚¤‚Éc‰¡”ä‚ğˆÛ‚µ‚Ä“®‰æ‚ğŠg‘åk¬
-	DRAWMOVOPT_ZOOMDISABLED,// ’ZŒ`—Ìˆæ‚Éû‚Ü‚é‚æ‚¤‚É“®‰æ‚ğk¬@¦Šg‘å‚Í‚³‚ê‚Ü‚¹‚ñ
+	DRAWMOVOPT_ASPECTVARI,	// çŸ­å½¢é ˜åŸŸã«ä¸€è‡´ã•ã›ã‚‹ã‚ˆã†ã«ç¸¦æ¨ªæ¯”ã‚’ç„¡è¦–ã—ã¦å‹•ç”»ã‚’æ‹¡å¤§ç¸®å°
+	DRAWMOVOPT_ASPECTFIXED,	// çŸ­å½¢é ˜åŸŸã«ä¸€è‡´ã•ã›ã‚‹ã‚ˆã†ã«ç¸¦æ¨ªæ¯”ã‚’ç¶­æŒã—ã¦å‹•ç”»ã‚’æ‹¡å¤§ç¸®å°
+	DRAWMOVOPT_ZOOMDISABLED,// çŸ­å½¢é ˜åŸŸã«åã¾ã‚‹ã‚ˆã†ã«å‹•ç”»ã‚’ç¸®å°ã€€â€»æ‹¡å¤§ã¯ã•ã‚Œã¾ã›ã‚“
 }DRAWMOVIEOPTION;
 
 
 //! @class CMovieToTexture
-//! @brief ƒ€[ƒr[ƒeƒNƒXƒ`ƒƒƒNƒ‰ƒX
+//! @brief ãƒ ãƒ¼ãƒ“ãƒ¼ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚¯ãƒ©ã‚¹
 class DirectXMovie {
 	CComPtr<IDirect3DDevice9>       m_pD3DDevice;   // Our rendering device
 	CComPtr<IDirect3DTexture9>      m_pTexture;     // Our texture
@@ -114,65 +114,65 @@ class DirectXMovie {
 	int m_iDrawWidth;
 	int m_iDrawHeight;
 
-	//! @param •  
+	//! @param å¹…  
 	LONG m_lWidth;
-	//! @param ‚‚³
+	//! @param é«˜ã•
 	LONG m_lHeight;
-	//! @param ƒsƒbƒ`
+	//! @param ãƒ”ãƒƒãƒ
 	LONG m_lPitch;
 
-	//! @param Œ³‚Ìƒ€[ƒr[‚ÌƒTƒCƒY(•A‚‚³) / ƒeƒNƒXƒ`ƒƒ‚ÌƒTƒCƒY(•A‚‚³)‚ÅZo‚·‚éUV’l
+	//! @param å…ƒã®ãƒ ãƒ¼ãƒ“ãƒ¼ã®ã‚µã‚¤ã‚º(å¹…ã€é«˜ã•) / ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚º(å¹…ã€é«˜ã•)ã§ç®—å‡ºã™ã‚‹UVå€¤
 	FLOAT m_fu, m_fv;
 
 	void CheckMovieStatus(void);
 	
 
 public:
-	DirectXMovie();	//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	~DirectXMovie();	//ƒfƒXƒgƒ‰ƒNƒ^
+	DirectXMovie();	//ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+	~DirectXMovie();	//ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 
 	VOID Clear(void);
 
 	//! @fn HRESULT InitDShowTextureRenderer(WCHAR* wFileName, const BOOL bSound)
-	//! @brief DirectShow‚©‚çƒeƒNƒXƒ`ƒƒ‚Ö‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒO‚Ö‚Ì‰Šú‰»
-	//! @param *lpD3DDevice (in) Direct3DƒfƒoƒCƒX
-	//! @param *wFileName (in) ƒ€[ƒr[ƒtƒ@ƒCƒ‹‚ÌƒpƒX
-	//! @param bSound (in) ƒTƒEƒ“ƒhÄ¶ƒtƒ‰ƒO
-	//! @param iDrawWidth (in) iDrawWidth “®‰æ‚ğÄ¶‚·‚éƒEƒBƒ“ƒhƒE‚Ì‰¡•
-	//! @param iDrawHeight (in) iDrawHeight “®‰æ‚ğÄ¶‚·‚éƒEƒBƒ“ƒhƒE‚Ìc•
-	//! @return ŠÖ”‚Ì¬”Û
+	//! @brief DirectShowã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¸ã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã¸ã®åˆæœŸåŒ–
+	//! @param *lpD3DDevice (in) Direct3Dãƒ‡ãƒã‚¤ã‚¹
+	//! @param *wFileName (in) ãƒ ãƒ¼ãƒ“ãƒ¼ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹
+	//! @param bSound (in) ã‚µã‚¦ãƒ³ãƒ‰å†ç”Ÿãƒ•ãƒ©ã‚°
+	//! @param iDrawWidth (in) iDrawWidth å‹•ç”»ã‚’å†ç”Ÿã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®æ¨ªå¹…
+	//! @param iDrawHeight (in) iDrawHeight å‹•ç”»ã‚’å†ç”Ÿã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç¸¦å¹…
+	//! @return é–¢æ•°ã®æˆå¦
 	HRESULT Create(IDirect3DDevice9 *lpD3DDevice, WCHAR* wFileName, const BOOL bSound, int iDrawWidth, int iDrawHeight);
 
 	//! @fn IDirect3DTexture9 * GetTexture()
-	//! @brief ƒ€[ƒr[ƒeƒNƒXƒ`ƒƒ‚Ìæ“¾
-	//! @return ƒ€[ƒr[‚ªƒŒƒ“ƒ_ƒŠƒ“ƒO‚³‚ê‚½ƒeƒNƒXƒ`ƒƒ
+	//! @brief ãƒ ãƒ¼ãƒ“ãƒ¼ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å–å¾—
+	//! @return ãƒ ãƒ¼ãƒ“ãƒ¼ãŒãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã•ã‚ŒãŸãƒ†ã‚¯ã‚¹ãƒãƒ£
 	HRESULT GetTexture(IDirect3DTexture9** pTexture) { return m_pTexture.CopyTo(pTexture); };
 
 
-	// “®‰æ‚ğƒeƒNƒXƒ`ƒƒ‚Æ‚µ‚Äw’è—Ìˆæ“à‚É•`‰æ
-	// ˆø” (in) drawArea “®‰æ‚ğ•`‰æ‚·‚é—Ìˆæ(ƒXƒNƒŠ[ƒ“À•W)
-	// –ß‚è’l ŠÖ”‚Ì¬”Û
+	// å‹•ç”»ã‚’ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¨ã—ã¦æŒ‡å®šé ˜åŸŸå†…ã«æç”»
+	// å¼•æ•° (in) drawArea å‹•ç”»ã‚’æç”»ã™ã‚‹é ˜åŸŸ(ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™)
+	// æˆ»ã‚Šå€¤ é–¢æ•°ã®æˆå¦
 	HRESULT DrawMovie(POINT &drawPoint, MOVIEPOSITIONFORMAT format);
 	HRESULT DrawMovie(RECT &drawArea, DRAWMOVIEOPTION option);
 	
 
 	//! @fn VOID Play()
-	//! @brief ƒ€[ƒr[‚ÌÄ¶
+	//! @brief ãƒ ãƒ¼ãƒ“ãƒ¼ã®å†ç”Ÿ
 	HRESULT Play() { return m_pMC->Run(); };
 
 	//! @fn VOID Stop()
-	//! @brief ƒ€[ƒr[‚Ì’â~
+	//! @brief ãƒ ãƒ¼ãƒ“ãƒ¼ã®åœæ­¢
 	HRESULT Stop() { return m_pMC->Stop(); };
 
 
 	//! @fn VOID SetSpeed(double time)
-	//! @brief Ä¶ƒXƒs[ƒh‚Ì•ÏX
-	//! @param time (in) Ä¶ƒXƒs[ƒh‚Ì”{—¦
+	//! @brief å†ç”Ÿã‚¹ãƒ”ãƒ¼ãƒ‰ã®å¤‰æ›´
+	//! @param time (in) å†ç”Ÿã‚¹ãƒ”ãƒ¼ãƒ‰ã®å€ç‡
 	HRESULT SetSpeed(double time) { return m_pMP->put_Rate(time); };
 
 	//! @fn double GetStopTime()
-	//! @brief I—¹ŠÔ‚Ìæ“¾
-	//! @return I—¹ŠÔ
+	//! @brief çµ‚äº†æ™‚é–“ã®å–å¾—
+	//! @return çµ‚äº†æ™‚é–“
 	double GetStopTime() {
 		REFTIME time;
 		m_pMP->get_StopTime(&time);
@@ -180,8 +180,8 @@ public:
 	};
 
 	//! @fn double GetDuration()
-	//! @brief ƒXƒgƒŠ[ƒ€‚ÌŠÔ•‚Ìæ“¾
-	//! @return ‘SƒXƒgƒŠ[ƒ€’·
+	//! @brief ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®æ™‚é–“å¹…ã®å–å¾—
+	//! @return å…¨ã‚¹ãƒˆãƒªãƒ¼ãƒ é•·
 	double GetDuration() {
 		REFTIME time;
 		m_pMP->get_Duration(&time);
@@ -189,8 +189,8 @@ public:
 	}
 
 	//! @fn double GetCurrentPosition()
-	//! @brief Œ»İ‚ÌÄ¶ˆÊ’u‚Ìæ“¾
-	//! @return Œ»İ‚ÌÄ¶ˆÊ’u
+	//! @brief ç¾åœ¨ã®å†ç”Ÿä½ç½®ã®å–å¾—
+	//! @return ç¾åœ¨ã®å†ç”Ÿä½ç½®
 	double GetCurrentPosition() {
 		REFTIME time;
 		m_pMP->get_CurrentPosition(&time);
@@ -198,15 +198,15 @@ public:
 	}
 
 	//! @fn VOID SetTime(double time)
-	//! @brief Œ»İ‚ÌÄ¶ˆÊ’u‚ğw’èˆÊ’u‚ÉƒZƒbƒg
-	//! @param time (in) ƒZƒbƒg‚µ‚½‚¢Ä¶ˆÊ’u
-	//! @return ŠÖ”‚Ì¬”Û
+	//! @brief ç¾åœ¨ã®å†ç”Ÿä½ç½®ã‚’æŒ‡å®šä½ç½®ã«ã‚»ãƒƒãƒˆ
+	//! @param time (in) ã‚»ãƒƒãƒˆã—ãŸã„å†ç”Ÿä½ç½®
+	//! @return é–¢æ•°ã®æˆå¦
 	HRESULT SetTime(double time) { return m_pMP->put_CurrentPosition(time); };
 
 	//! @fn VOID GetUV(FLOAT* u, FLOAT* v)
-	//! @brief Ä¶‚·‚éƒeƒNƒXƒ`ƒƒ‚ÌƒTƒCƒY‚Æƒ€[ƒr[‚ÌƒTƒCƒY‚ª‡‚í‚È‚¢ê‡‚Ì—]è•ª‚ğƒJƒbƒg‚·‚é‚½‚ß‚ÌUV’læ“¾
-	//! @param *u (out) ƒeƒNƒXƒ`ƒƒÀ•WU
-	//! @param *v (out) ƒeƒNƒXƒ`ƒƒÀ•WV
+	//! @brief å†ç”Ÿã™ã‚‹ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚µã‚¤ã‚ºã¨ãƒ ãƒ¼ãƒ“ãƒ¼ã®ã‚µã‚¤ã‚ºãŒåˆã‚ãªã„å ´åˆã®ä½™å‰°åˆ†ã‚’ã‚«ãƒƒãƒˆã™ã‚‹ãŸã‚ã®UVå€¤å–å¾—
+	//! @param *u (out) ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™U
+	//! @param *v (out) ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™V
 	HRESULT GetUV(FLOAT* u, FLOAT* v) {
 		if (u == NULL) return E_POINTER;
 		if (v == NULL) return E_POINTER;
@@ -226,11 +226,11 @@ public:
 
 
 	//! @fn VOID GetEvent(long* lEventCode, long* lParam1, long* lParam2, long msTimeout)
-	//! @brief ƒ€[ƒr[‚ÌƒCƒxƒ“ƒgæ“¾
-	//! @param lEventCode (out) ƒCƒxƒ“ƒg ƒR[ƒh‚ğó‚¯æ‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^
-	//! @param lParam1 (out) ‘æ 1 ƒCƒxƒ“ƒgˆø”‚ğó‚¯æ‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^B
-	//! @param lParam2 (out) ‘æ 2 ƒCƒxƒ“ƒgˆø”‚ğó‚¯æ‚é•Ï”‚Ö‚Ìƒ|ƒCƒ“ƒ^B
-	//! @param msTimeout (in) ƒ^ƒCƒ€ƒAƒEƒgŠÔ (ƒ~ƒŠ•b’PˆÊ)BƒCƒxƒ“ƒg‚ª“’…‚·‚é‚Ü‚Å“®ì‚ğ’â~‚·‚é‚É‚ÍAINFINITE ‚ğg‚¤B
+	//! @brief ãƒ ãƒ¼ãƒ“ãƒ¼ã®ã‚¤ãƒ™ãƒ³ãƒˆå–å¾—
+	//! @param lEventCode (out) ã‚¤ãƒ™ãƒ³ãƒˆ ã‚³ãƒ¼ãƒ‰ã‚’å—ã‘å–ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿
+	//! @param lParam1 (out) ç¬¬ 1 ã‚¤ãƒ™ãƒ³ãƒˆå¼•æ•°ã‚’å—ã‘å–ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
+	//! @param lParam2 (out) ç¬¬ 2 ã‚¤ãƒ™ãƒ³ãƒˆå¼•æ•°ã‚’å—ã‘å–ã‚‹å¤‰æ•°ã¸ã®ãƒã‚¤ãƒ³ã‚¿ã€‚
+	//! @param msTimeout (in) ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆæ™‚é–“ (ãƒŸãƒªç§’å˜ä½)ã€‚ã‚¤ãƒ™ãƒ³ãƒˆãŒåˆ°ç€ã™ã‚‹ã¾ã§å‹•ä½œã‚’åœæ­¢ã™ã‚‹ã«ã¯ã€INFINITE ã‚’ä½¿ã†ã€‚
 	VOID GetEvent(long* lEventCode, LONG_PTR *lParam1, LONG_PTR *lParam2, long msTimeout);
 };
 

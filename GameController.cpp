@@ -1,4 +1,4 @@
-#include "GameController.hpp"
+ï»¿#include "GameController.hpp"
 
 
 GameController::GameController() {
@@ -10,22 +10,22 @@ GameController::~GameController() {
 }
 
 bool GameController::Init(HWND hWnd, HINSTANCE hInstance) {
-	// DirectInput¶¬
+	// DirectInputç”Ÿæˆ
 	if (!di.Create(hWnd, hInstance)) {
 		return false;
 	}
 
-	// ƒL[ƒ{[ƒh‚ğg‚¤
+	// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã‚’ä½¿ã†
 	if (!di.CreateKeyboard()) {
 		return false;
 	}
 
-	// MIDIƒL[ƒ{[ƒh“ü—Í‚Ì€”õ
+	// MIDIã‚­ãƒ¼ãƒœãƒ¼ãƒ‰å…¥åŠ›ã®æº–å‚™
 	if (!mi.Create()) {
 		return false;
 	}
 
-	// MIDIƒL[ƒ{[ƒh“ü—ÍƒXƒ^[ƒg
+	// MIDIã‚­ãƒ¼ãƒœãƒ¼ãƒ‰å…¥åŠ›ã‚¹ã‚¿ãƒ¼ãƒˆ
 	if (!mi.StartInput()) {
 		return false;
 	}
@@ -36,7 +36,7 @@ bool GameController::Init(HWND hWnd, HINSTANCE hInstance) {
 
 bool GameController::Update() {
 
-	// ƒL[ƒ{[ƒh“ü—Í
+	// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰å…¥åŠ›
 	unsigned char keyboard[256];
 	bool IsValidKeybd = di.GetKeyboard(keyboard);
 
@@ -44,13 +44,13 @@ bool GameController::Update() {
 		return false;
 	}
 
-	// midiƒL[ƒ{[ƒh“ü—Í
+	// midiã‚­ãƒ¼ãƒœãƒ¼ãƒ‰å…¥åŠ›
 	MIDIKEYSTATE midiKey[MIDIKEYCNT];
 	bool IsValidMidi = mi.GetKeyState(midiKey);
 
 
 	if (IsValidMidi) {
-		// midiƒL[ƒ{[ƒh‚ğg‚¤
+		// midiã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã‚’ä½¿ã†
 
 		for (int i=0; i<KEYCOUNT; i++) {
 			switch (midiKey[i]) {
@@ -66,9 +66,9 @@ bool GameController::Update() {
 
 	}
 	else {
-		// ƒL[ƒ{[ƒh‚ğg‚¤
+		// ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã‚’ä½¿ã†
 
-		static const int KEYID[63] ={		// ƒL[‚ÌƒŠƒXƒg
+		static const int KEYID[63] ={		// ã‚­ãƒ¼ã®ãƒªã‚¹ãƒˆ
 			DIK_1, DIK_2, DIK_3, DIK_4, DIK_5, DIK_6, DIK_7, DIK_8, DIK_9, DIK_0, DIK_MINUS, DIK_CIRCUMFLEX, DIK_YEN, DIK_BACKSPACE, DIK_NUMLOCK, DIK_DIVIDE, DIK_MULTIPLY,
 			DIK_Q, DIK_W, DIK_E, DIK_R, DIK_T, DIK_Y, DIK_U, DIK_I, DIK_O, DIK_P, DIK_AT, DIK_LBRACKET, DIK_RETURN, DIK_NUMPAD7, DIK_NUMPAD8, DIK_NUMPAD9,
 			DIK_A, DIK_S, DIK_D, DIK_F, DIK_G, DIK_H, DIK_J, DIK_K, DIK_L, DIK_SEMICOLON, DIK_COLON, DIK_RBRACKET, DIK_NUMPAD4, DIK_NUMPAD5, DIK_NUMPAD6,
@@ -77,7 +77,7 @@ bool GameController::Update() {
 
 		bool on[KEYCOUNT];
 		for (int i=0; i<KEYCOUNT; i++) {
-			on[i] = bIsKeyOn[i];	// ƒoƒbƒNƒAƒbƒv
+			on[i] = bIsKeyOn[i];	// ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—
 		}
 
 		ZeroMemory(bIsKeyOn, sizeof(bIsKeyOn));
@@ -86,13 +86,13 @@ bool GameController::Update() {
 			double x;
 			if (!GetKeyPosition(KEYID[i], 0.0, 0.99, &x)) continue;
 
-			int virKeyNum = (int)(x*KEYCOUNT);		// ‰¼‘zƒL[‚ÌˆÊ’u‚É•ÏŠ·
+			int virKeyNum = (int)(x*KEYCOUNT);		// ä»®æƒ³ã‚­ãƒ¼ã®ä½ç½®ã«å¤‰æ›
 
 			if (keyboard[KEYID[i]]&0x80) {
 				bIsKeyOn[virKeyNum] = true;
 
 				if (!on[virKeyNum]) {
-					// ‚Ü‚¾‰Ÿ‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Î‰Ÿ‚³‚ê‚½uŠÔ‚Æ‚·‚é
+					// ã¾ã æŠ¼ã•ã‚Œã¦ã„ãªã‘ã‚Œã°æŠ¼ã•ã‚ŒãŸç¬é–“ã¨ã™ã‚‹
 					bIsKeyPressed[virKeyNum] = true;
 				}
 			}

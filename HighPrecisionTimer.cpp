@@ -1,4 +1,4 @@
-#include "HighPrecisionTimer.hpp"
+ï»¿#include "HighPrecisionTimer.hpp"
 
 HighPrecisionTimer::HighPrecisionTimer() {
 	llStartCount.QuadPart = 0;
@@ -9,14 +9,14 @@ HighPrecisionTimer::HighPrecisionTimer() {
 	bIsReset = true;
 	dTime = 0.0;
 
-	// ü”g”‚ğæ“¾
+	// å‘¨æ³¢æ•°ã‚’å–å¾—
 	if (QueryPerformanceFrequency(&llFrequency)) {
 		bIsHighPrecValid = true;
 	}
 	else {
 		/*
-		‚¸“xƒ^ƒCƒ}[‚ªg—p‚Å‚«‚È‚¢ê‡AtimeGetTimeŠÖ”‚Å‘ã—p‚µ‚Ü‚·B
-		‚»‚ÌÛA¸“x‚ğ1ms‚Åæ“¾‚·‚é‚Ì‚Åü”g”‚ğ1000Hz‚Éİ’è‚µ‚Ü‚·B
+		é«˜ç²¾åº¦ã‚¿ã‚¤ãƒãƒ¼ãŒä½¿ç”¨ã§ããªã„å ´åˆã€timeGetTimeé–¢æ•°ã§ä»£ç”¨ã—ã¾ã™ã€‚
+		ãã®éš›ã€ç²¾åº¦ã‚’1msã§å–å¾—ã™ã‚‹ã®ã§å‘¨æ³¢æ•°ã‚’1000Hzã«è¨­å®šã—ã¾ã™ã€‚
 		*/
 
 		llFrequency.QuadPart = 1000LL;
@@ -34,7 +34,7 @@ void HighPrecisionTimer::Start() {
 	if (bIsPaused) {
 		LARGE_INTEGER now;
 
-		// Œ»İ‚ÌƒJƒEƒ“ƒg‚ğæ“¾
+		// ç¾åœ¨ã®ã‚«ã‚¦ãƒ³ãƒˆã‚’å–å¾—
 		if (bIsHighPrecValid) {
 			QueryPerformanceCounter(&now);
 		}
@@ -44,12 +44,12 @@ void HighPrecisionTimer::Start() {
 			timeEndPeriod(1);
 		}
 
-		// ƒ^ƒCƒ}[ŠJn‚ÌŠÔ‚ğ•ÏX
+		// ã‚¿ã‚¤ãƒãƒ¼é–‹å§‹ã®æ™‚é–“ã‚’å¤‰æ›´
 		if (bIsReset) {
 			llStartCount.QuadPart = now.QuadPart;
 		}
 		else {
-			// ˆê’â~‚µ‚½ŠÔ•ª‚¾‚¯‚¸‚ç‚·
+			// ä¸€æ™‚åœæ­¢ã—ãŸæ™‚é–“åˆ†ã ã‘ãšã‚‰ã™
 			llStartCount.QuadPart += now.QuadPart - llPauseStCount.QuadPart;
 		}
 
@@ -64,12 +64,12 @@ void HighPrecisionTimer::Pause() {
 
 	if (bIsPaused) {
 		/*
-		Šù‚Éˆê’â~’†‚Ìê‡‚Í‰½‚à‚µ‚Ü‚¹‚ñ
+		æ—¢ã«ä¸€æ™‚åœæ­¢ä¸­ã®å ´åˆã¯ä½•ã‚‚ã—ã¾ã›ã‚“
 		*/
 	}
 	else {
 
-		// ˆê’â~ŠJn‚ÌƒJƒEƒ“ƒg‚ğæ“¾
+		// ä¸€æ™‚åœæ­¢é–‹å§‹æ™‚ã®ã‚«ã‚¦ãƒ³ãƒˆã‚’å–å¾—
 		if (bIsHighPrecValid) {
 			QueryPerformanceCounter(&llPauseStCount);
 		}
@@ -79,7 +79,7 @@ void HighPrecisionTimer::Pause() {
 			timeEndPeriod(1);
 		}
 
-		// ˆê’â~‚Ìƒ^ƒCƒ€‚ğ•Û‘¶
+		// ä¸€æ™‚åœæ­¢æ™‚ã®ã‚¿ã‚¤ãƒ ã‚’ä¿å­˜
 		dTime = (double)(llPauseStCount.QuadPart - llStartCount.QuadPart)/llFrequency.QuadPart;
 
 		bIsPaused = true;
@@ -96,7 +96,7 @@ void HighPrecisionTimer::Reset() {
 	}
 	else {
 		/*
-		ˆê’â~’†‚Å‚È‚¢‚Æ“®ì‚µ‚Ü‚¹‚ñ
+		ä¸€æ™‚åœæ­¢ä¸­ã§ãªã„ã¨å‹•ä½œã—ã¾ã›ã‚“
 		*/
 	}
 
@@ -107,7 +107,7 @@ double HighPrecisionTimer::GetTime() {
 
 	if (bIsPaused == false) {
 
-		// ƒ^ƒCƒ€‚ğXV
+		// ã‚¿ã‚¤ãƒ ã‚’æ›´æ–°
 		LARGE_INTEGER now;
 		if (bIsHighPrecValid) {
 			QueryPerformanceCounter(&now);

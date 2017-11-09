@@ -1,6 +1,6 @@
-/*
+ï»¿/*
 ! @file movietex.cpp
-! @bref	ƒ€[ƒr[ƒeƒNƒXƒ`ƒƒƒNƒ‰ƒX
+! @bref	ãƒ ãƒ¼ãƒ“ãƒ¼ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚¯ãƒ©ã‚¹
 ! @author	Masafumi TAKAHASHI
 */
 
@@ -9,7 +9,7 @@
 
 #include "DirectXMovie.h"
 
-//ƒOƒ[ƒoƒ‹
+//ã‚°ãƒ­ãƒ¼ãƒãƒ«
 TCHAR g_achCopy[]     = TEXT("Bitwise copy of the sample");
 TCHAR g_achOffscr[]   = TEXT("Using offscreen surfaces and StretchCopy()");
 TCHAR g_achDynTextr[] = TEXT("Using Dynamic Textures");
@@ -43,7 +43,7 @@ void Msg(TCHAR *szFormat, ...) {
 //			CMovieTexture
 //
 
-//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 CMovieTexture::CMovieTexture(LPUNKNOWN pUnk, HRESULT *phr)
 	: CBaseVideoRenderer(__uuidof(CLSID_TextureRenderer),
 		NAME("Texture Renderer"), pUnk, phr),
@@ -54,7 +54,7 @@ CMovieTexture::CMovieTexture(LPUNKNOWN pUnk, HRESULT *phr)
 		*phr = S_OK;
 }
 
-//ƒfƒXƒgƒ‰ƒNƒ^
+//ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 CMovieTexture::~CMovieTexture() {
 }
 
@@ -94,24 +94,24 @@ HRESULT CMovieTexture::SetMediaType(const CMediaType *pmt) {
 	UINT uintHeight = 2;
 
 	D3DCAPS9 caps;
-	VIDEOINFO *pviBmp;                      // ƒrƒbƒgƒ}ƒbƒv‚Ìî•ñ‚ªŠi”[
+	VIDEOINFO *pviBmp;                      // ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã®æƒ…å ±ãŒæ ¼ç´
 	pviBmp = (VIDEOINFO *)pmt->Format();
 
 	m_lVidWidth  = pviBmp->bmiHeader.biWidth;
 	m_lVidHeight = abs(pviBmp->bmiHeader.biHeight);
-	m_lVidPitch  = (m_lVidWidth * 3 + 3) & ~(3); // 24bitƒJƒ‰[
+	m_lVidPitch  = (m_lVidWidth * 3 + 3) & ~(3); // 24bitã‚«ãƒ©ãƒ¼
 
-												 // ƒeƒNƒXƒ`ƒƒ‚ªƒ_ƒCƒiƒ~ƒbƒNƒeƒNƒXƒ`ƒƒ‚©ƒ`ƒFƒbƒN
+												 // ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒãƒ€ã‚¤ãƒŠãƒŸãƒƒã‚¯ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‹ãƒã‚§ãƒƒã‚¯
 	ZeroMemory(&caps, sizeof(D3DCAPS9));
 	hr = m_pd3dDevice->GetDeviceCaps(&caps);
 	if (caps.Caps2 & D3DCAPS2_DYNAMICTEXTURES) {
-		// ƒ_ƒCƒiƒ~ƒbƒNƒeƒNƒXƒ`ƒƒ‚Ìê‡
+		// ãƒ€ã‚¤ãƒŠãƒŸãƒƒã‚¯ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å ´åˆ
 		m_bUseDynamicTextures = TRUE;
 	}
 
 	if (caps.TextureCaps & D3DPTEXTURECAPS_POW2
 		&& caps.TextureCaps & !D3DPTEXTURECAPS_NONPOW2CONDITIONAL) {
-		// ƒeƒNƒXƒ`ƒƒ‚ª2‚Ì—İæ‚Å‚È‚¢‚Æì¬‚Å‚«‚È‚¢ê‡
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒ2ã®ç´¯ä¹—ã§ãªã„ã¨ä½œæˆã§ããªã„å ´åˆ
 		while ((LONG)uintWidth < m_lVidWidth) {
 			uintWidth = uintWidth << 1;
 		}
@@ -120,7 +120,7 @@ HRESULT CMovieTexture::SetMediaType(const CMediaType *pmt) {
 		}
 	}
 	else {
-		// ƒeƒNƒXƒ`ƒƒ‚ª”ñ2‚Ì—İæ‚Å‚æ‚¯‚ê‚Î
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒé2ã®ç´¯ä¹—ã§ã‚ˆã‘ã‚Œã°
 		uintWidth = m_lVidWidth;
 		uintHeight = m_lVidHeight;
 		m_bUseDynamicTextures = FALSE;
@@ -128,7 +128,7 @@ HRESULT CMovieTexture::SetMediaType(const CMediaType *pmt) {
 
 	hr = E_UNEXPECTED;
 	if (m_bUseDynamicTextures) {
-		// ƒ_ƒCƒiƒ~ƒbƒNƒeƒNƒXƒ`ƒƒ‚Åì¬”„‚é
+		// ãƒ€ã‚¤ãƒŠãƒŸãƒƒã‚¯ãƒ†ã‚¯ã‚¹ãƒãƒ£ã§ä½œæˆå£²ã‚‹
 		hr = m_pd3dDevice->CreateTexture(uintWidth, uintHeight, 1, 0,
 			D3DFMT_X8R8G8B8, D3DPOOL_DEFAULT,
 			&m_pTexture, NULL);
@@ -179,7 +179,7 @@ HRESULT CMovieTexture::SetMediaType(const CMediaType *pmt) {
 // DoRenderSample: A sample has been delivered. Copy it to the texture.
 //-----------------------------------------------------------------------------
 HRESULT CMovieTexture::DoRenderSample(IMediaSample * pSample) {
-	BYTE  *pBmpBuffer, *pTxtBuffer; // ƒrƒbƒgƒ}ƒbƒvAƒeƒNƒXƒ`ƒƒ
+	BYTE  *pBmpBuffer, *pTxtBuffer; // ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã€ãƒ†ã‚¯ã‚¹ãƒãƒ£
 	LONG  lTxtPitch;                // Pitch of bitmap, texture
 
 	BYTE  * pbS = NULL;
@@ -190,10 +190,10 @@ HRESULT CMovieTexture::DoRenderSample(IMediaSample * pSample) {
 	CheckPointer(pSample, E_POINTER);
 	CheckPointer(m_pTexture, E_UNEXPECTED);
 
-	// ƒrƒfƒI‚©‚çƒrƒbƒgƒ}ƒbƒv‚ğæ‚èo‚·
+	// ãƒ“ãƒ‡ã‚ªã‹ã‚‰ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’å–ã‚Šå‡ºã™
 	pSample->GetPointer(&pBmpBuffer);
 
-	// ƒeƒNƒXƒ`ƒƒ‚ğƒƒbƒN‚·‚é
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ãƒ­ãƒƒã‚¯ã™ã‚‹
 	D3DLOCKED_RECT d3dlr;
 	if (m_bUseDynamicTextures) {
 		if (FAILED(m_pTexture->LockRect(0, &d3dlr, 0, D3DLOCK_DISCARD)))
@@ -203,14 +203,14 @@ HRESULT CMovieTexture::DoRenderSample(IMediaSample * pSample) {
 		if (FAILED(m_pTexture->LockRect(0, &d3dlr, 0, 0)))
 			return E_FAIL;
 	}
-	// ƒeƒNƒXƒ`ƒƒ‚Ìƒsƒbƒ`•‚Ìæ“¾
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ”ãƒƒãƒå¹…ã®å–å¾—
 	pTxtBuffer = static_cast<byte *>(d3dlr.pBits);
 	lTxtPitch = d3dlr.Pitch;
 
 
-	// ƒRƒs[
+	// ã‚³ãƒ”ãƒ¼
 
-	// 32bitƒJƒ‰[‚ÌƒeƒNƒXƒ`ƒƒ‚Ìê‡
+	// 32bitã‚«ãƒ©ãƒ¼ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å ´åˆ
 	if (m_TextureFormat == D3DFMT_X8R8G8B8) {
 		// Instead of copying data bytewise, we use DWORD alignment here.
 		// We also unroll loop by copying 4 pixels at once.
@@ -254,7 +254,7 @@ HRESULT CMovieTexture::DoRenderSample(IMediaSample * pSample) {
 		}// for rows
 	}
 
-	// 16bit‚ÌƒeƒNƒXƒ`ƒƒ‚Ìê‡
+	// 16bitã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å ´åˆ
 	if (m_TextureFormat == D3DFMT_A1R5G5B5) {
 		for (int y = 0; y < m_lVidHeight; y++) {
 			BYTE *pBmpBufferOld = pBmpBuffer;
@@ -276,14 +276,14 @@ HRESULT CMovieTexture::DoRenderSample(IMediaSample * pSample) {
 		}
 	}
 
-	// ƒAƒ“ƒƒbƒN
+	// ã‚¢ãƒ³ãƒ­ãƒƒã‚¯
 	if (FAILED(m_pTexture->UnlockRect(0)))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-//ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 DirectXMovie::DirectXMovie() {
 	m_pGB = NULL;
 	m_pMC = NULL;
@@ -299,20 +299,20 @@ DirectXMovie::DirectXMovie() {
 	m_fu = m_fv = 1.0f;
 }
 
-//ƒfƒXƒgƒ‰ƒNƒ^
+//ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 DirectXMovie::~DirectXMovie() {
 	Clear();
 }
 
 
 //! @fn HRESULT InitDShowTextureRenderer(WCHAR* wFileName, const BOOL bSound)
-//! @brief DirectShow‚©‚çƒeƒNƒXƒ`ƒƒ‚Ö‚ÌƒŒƒ“ƒ_ƒŠƒ“ƒO‚Ö‚Ì‰Šú‰»
-//! @param *lpD3DDevice (in) Direct3DƒfƒoƒCƒX
-//! @param *wFileName (in) ƒ€[ƒr[ƒtƒ@ƒCƒ‹‚ÌƒpƒX
-//! @param bSound (in) ƒTƒEƒ“ƒhÄ¶ƒtƒ‰ƒO
-//! @param iDrawWidth (in) iDrawWidth “®‰æ‚ğÄ¶‚·‚éƒEƒBƒ“ƒhƒE‚Ì‰¡•
-//! @param iDrawHeight (in) iDrawHeight “®‰æ‚ğÄ¶‚·‚éƒEƒBƒ“ƒhƒE‚Ìc•
-//! @return ŠÖ”‚Ì¬”Û
+//! @brief DirectShowã‹ã‚‰ãƒ†ã‚¯ã‚¹ãƒãƒ£ã¸ã®ãƒ¬ãƒ³ãƒ€ãƒªãƒ³ã‚°ã¸ã®åˆæœŸåŒ–
+//! @param *lpD3DDevice (in) Direct3Dãƒ‡ãƒã‚¤ã‚¹
+//! @param *wFileName (in) ãƒ ãƒ¼ãƒ“ãƒ¼ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹
+//! @param bSound (in) ã‚µã‚¦ãƒ³ãƒ‰å†ç”Ÿãƒ•ãƒ©ã‚°
+//! @param iDrawWidth (in) iDrawWidth å‹•ç”»ã‚’å†ç”Ÿã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®æ¨ªå¹…
+//! @param iDrawHeight (in) iDrawHeight å‹•ç”»ã‚’å†ç”Ÿã™ã‚‹ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ç¸¦å¹…
+//! @return é–¢æ•°ã®æˆå¦
 HRESULT DirectXMovie::Create(IDirect3DDevice9 *lpD3DDevice, WCHAR* wFileName, const BOOL bSound, int iDrawWidth, int iDrawHeight) {
 	if (lpD3DDevice == NULL)	return E_POINTER;
 	if (iDrawWidth <= 0)		return E_INVALIDARG;
@@ -325,12 +325,12 @@ HRESULT DirectXMovie::Create(IDirect3DDevice9 *lpD3DDevice, WCHAR* wFileName, co
 	CComPtr<IPin>           pFSrcPinOut;    // Source Filter Output Pin   
 	CMovieTexture			*pCTR=0;        // DirectShow Texture renderer
 
-	// î•ñ‚ğ•Û‘¶
+	// æƒ…å ±ã‚’ä¿å­˜
 	m_pD3DDevice = lpD3DDevice;
 	m_iDrawWidth = iDrawWidth;
 	m_iDrawHeight = iDrawHeight;
 
-	// ƒtƒBƒ‹ƒ^ƒOƒ‰ƒt‚Ìì¬
+	// ãƒ•ã‚£ãƒ«ã‚¿ã‚°ãƒ©ãƒ•ã®ä½œæˆ
 	if (FAILED(m_pGB.CoCreateInstance(CLSID_FilterGraph, NULL, CLSCTX_INPROC)))
 		return E_FAIL;
 
@@ -354,7 +354,7 @@ HRESULT DirectXMovie::Create(IDirect3DDevice9 *lpD3DDevice, WCHAR* wFileName, co
 		return hr;
 	}
 
-	// ƒtƒBƒ‹ƒ^ƒOƒ‰ƒO‚Éƒ\[ƒX‚ğ’Ç‰Á
+	// ãƒ•ã‚£ãƒ«ã‚¿ã‚°ãƒ©ã‚°ã«ã‚½ãƒ¼ã‚¹ã‚’è¿½åŠ 
 	hr = m_pGB->AddSourceFilter(wFileName, L"SOURCE", &pFSrc);
 
 	// If the media file was not found, inform the user.
@@ -370,9 +370,9 @@ HRESULT DirectXMovie::Create(IDirect3DDevice9 *lpD3DDevice, WCHAR* wFileName, co
 	}
 
 	if (SUCCEEDED(hr = pFSrc->FindPin(L"Output", &pFSrcPinOut))) {
-		//AVI‚Æ‚©MPEG1‚Æ‚©VFW‚Å‚¢‚¯‚é‚â‚Â
+		//AVIã¨ã‹MPEG1ã¨ã‹VFWã§ã„ã‘ã‚‹ã‚„ã¤
 
-		//ƒI[ƒfƒBƒIƒgƒ‰ƒbƒN‚ğÄ¶‚µ‚È‚¢ê‡@NO_AUDIO_RENDERER@‚ğ’è‹`
+		//ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªãƒˆãƒ©ãƒƒã‚¯ã‚’å†ç”Ÿã—ãªã„å ´åˆã€€NO_AUDIO_RENDERERã€€ã‚’å®šç¾©
 		if (!bSound) {
 
 			// If no audio component is desired, directly connect the two video pins
@@ -408,16 +408,16 @@ HRESULT DirectXMovie::Create(IDirect3DDevice9 *lpD3DDevice, WCHAR* wFileName, co
 		CComPtr<IBasicAudio> IAudio;
 		hr = m_pGB.QueryInterface(&IAudio);
 
-		//WMV‚Æ‚©MPEG2‚Æ‚©
+		//WMVã¨ã‹MPEG2ã¨ã‹
 		hr = m_pGB->RenderFile(wFileName, NULL);
 		if (FAILED(hr))
 			return hr;
 		if (!bSound) {
-			// –³‰¹
+			// ç„¡éŸ³
 			hr = IAudio->put_Volume(-10000);
 		}
 		else {
-			//‰¹‚Ìo—Í
+			//éŸ³ã®å‡ºåŠ›
 			hr = IAudio->put_Volume(0);
 		}
 	}
@@ -433,19 +433,19 @@ HRESULT DirectXMovie::Create(IDirect3DDevice9 *lpD3DDevice, WCHAR* wFileName, co
 		return hr;
 	}
 
-	//ƒeƒNƒXƒ`ƒƒ‚Ìæ“¾
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®å–å¾—
 	m_pTexture = pCTR->GetTexture();
 	pCTR->GetVideoDesc(&m_lWidth, &m_lHeight, &m_lPitch);
 
 	D3DSURFACE_DESC desc;
 	m_pTexture->GetLevelDesc(0, &desc);
 
-	//ƒeƒNƒXƒ`ƒƒ‚ª2‚Ì—İæ‚Å‚µ‚©Šm•Û‚Å‚«‚È‚¢ê‡‚É—]è•ª‚ğ•\¦‚µ‚È‚¢‚½‚ß‚ÌUVŒvZ
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒ2ã®ç´¯ä¹—ã§ã—ã‹ç¢ºä¿ã§ããªã„å ´åˆã«ä½™å‰°åˆ†ã‚’è¡¨ç¤ºã—ãªã„ãŸã‚ã®UVè¨ˆç®—
 	m_fu = (FLOAT)m_lWidth / (FLOAT)desc.Width;
 	m_fv = (FLOAT)m_lHeight / (FLOAT)desc.Height;
 
 
-	// ’¸“_ƒoƒbƒtƒ@ì¬
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ä½œæˆ
 	hr = m_pD3DDevice->CreateVertexBuffer(sizeof(MOVIEVERTEX)*4, 0, D3DFVF_MOVIEVERTEX, D3DPOOL_MANAGED, &m_pD3DVertex, NULL);
 	if (FAILED(hr)) return hr;
 	MOVIEVERTEX vtx[] ={
@@ -471,7 +471,7 @@ HRESULT DirectXMovie::Create(IDirect3DDevice9 *lpD3DDevice, WCHAR* wFileName, co
 HRESULT DirectXMovie::DrawMovie(POINT &drawPoint, MOVIEPOSITIONFORMAT format) {
 	if (&drawPoint == NULL) return E_POINTER;
 
-	// ’ZŒ`—Ìˆæ‚ğZo
+	// çŸ­å½¢é ˜åŸŸã‚’ç®—å‡º
 	RECT drawArea;
 	LONG w, h;
 	GetMovieSize(&w, &h, NULL);
@@ -504,7 +504,7 @@ HRESULT DirectXMovie::DrawMovie(RECT &drawArea, DRAWMOVIEOPTION option) {
 	LONG drawSizeW, drawSizeH;
 	LONG resultSizeW, resultSizeH;
 
-	// ƒXƒNƒŠ[ƒ“‚Ì¶ã‹÷‚ğŒ´“_‚Æ‚µ‚½À•W‚É•ÏŠ·
+	// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®å·¦ä¸Šéš…ã‚’åŸç‚¹ã¨ã—ãŸåº§æ¨™ã«å¤‰æ›
 	drawArea.left -= m_iDrawWidth/2;
 	drawArea.right -= m_iDrawWidth/2;
 	drawArea.top -= m_iDrawHeight/2;
@@ -512,7 +512,7 @@ HRESULT DirectXMovie::DrawMovie(RECT &drawArea, DRAWMOVIEOPTION option) {
 	drawArea.bottom -= m_iDrawHeight/2;
 	drawArea.bottom *= -1;
 
-	// ƒtƒH[ƒ}ƒbƒg‚ğ‚à‚Æ‚É“®‰æƒTƒCƒY‚ğZo
+	// ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’ã‚‚ã¨ã«å‹•ç”»ã‚µã‚¤ã‚ºã‚’ç®—å‡º
 	drawSizeW = drawArea.right - drawArea.left;
 	drawSizeH = drawArea.top - drawArea.bottom;
 	GetMovieSize(&movieSizeW, &movieSizeH, NULL);
@@ -521,9 +521,9 @@ HRESULT DirectXMovie::DrawMovie(RECT &drawArea, DRAWMOVIEOPTION option) {
 		resultSizeH = drawSizeH;
 	}
 	else {
-		// •`‰æ—Ìˆæ‚Æ“®‰æ‚ÌƒAƒXƒyƒNƒg”ä‚ğ”äŠr
+		// æç”»é ˜åŸŸã¨å‹•ç”»ã®ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‚’æ¯”è¼ƒ
 		if ((FLOAT)drawSizeW/(FLOAT)drawSizeH > (FLOAT)movieSizeW/(FLOAT)movieSizeH) {
-			// •`‰æ—Ìˆæ‚Ìc‚Ì’·‚³‚É“®‰æ‚ğ‡‚í‚¹‚é
+			// æç”»é ˜åŸŸã®ç¸¦ã®é•·ã•ã«å‹•ç”»ã‚’åˆã‚ã›ã‚‹
 			FLOAT scale = (FLOAT)movieSizeH/(FLOAT)drawSizeH;
 			if (option == DRAWMOVOPT_ZOOMDISABLED && scale < 1.0f) scale = 1.0f;
 
@@ -531,7 +531,7 @@ HRESULT DirectXMovie::DrawMovie(RECT &drawArea, DRAWMOVIEOPTION option) {
 			resultSizeW = (INT)(movieSizeW/scale);
 		}
 		else {
-			// •`‰æ—Ìˆæ‚Ì•‚Ì’·‚³‚É“®‰æ‚ğ‡‚í‚¹‚é
+			// æç”»é ˜åŸŸã®å¹…ã®é•·ã•ã«å‹•ç”»ã‚’åˆã‚ã›ã‚‹
 			FLOAT scale = (FLOAT)movieSizeW/(FLOAT)drawSizeW;
 			if (option == DRAWMOVOPT_ZOOMDISABLED && scale < 1.0f) scale = 1.0f;
 
@@ -541,40 +541,40 @@ HRESULT DirectXMovie::DrawMovie(RECT &drawArea, DRAWMOVIEOPTION option) {
 	}
 
 
-	//-------------------•`‰æİ’è---------------------------------------
-	// ƒ‰ƒCƒg‚ÍƒIƒt‚Å
+	//-------------------æç”»è¨­å®š---------------------------------------
+	// ãƒ©ã‚¤ãƒˆã¯ã‚ªãƒ•ã§
 	m_pD3DDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-	// ƒ¿ƒuƒŒƒ“ƒhİ’è
+	// Î±ãƒ–ãƒ¬ãƒ³ãƒ‰è¨­å®š
 	m_pD3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	m_pD3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	m_pD3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	//ƒeƒNƒXƒ`ƒƒ‚ÌƒAƒ‹ƒtƒ@‚ğ“§–¾“x‚ğg—p‚·‚éİ’è
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚¢ãƒ«ãƒ•ã‚¡ã‚’é€æ˜åº¦ã‚’ä½¿ç”¨ã™ã‚‹è¨­å®š
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TEXTURE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	m_pD3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
 	m_pD3DDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
-	m_pD3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);					// ¶èŒn
+	m_pD3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);					// å·¦æ‰‹ç³»
 
-	m_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);			// ƒeƒNƒXƒ`ƒƒ‚ª‚Í‚İo‚½‚É•\¦‚µ‚È‚¢‚É‚·‚é
+	m_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);			// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒã¯ã¿å‡ºãŸæ™‚ã«è¡¨ç¤ºã—ãªã„ã«ã™ã‚‹
 	m_pD3DDevice->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	m_pD3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	m_pD3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	//-------------------------------------------------------------------
 
-	D3DXMATRIX worldOffset;						// ƒ|ƒŠƒSƒ“‚Ì”z’uÀ•W
-	D3DXMATRIX localScale;						// ƒ|ƒŠƒSƒ“‚Ì‘å‚«‚³ (Šg‘å”{—¦
-	D3DXMATRIX localOffset;						// ƒ|ƒŠƒSƒ“‚ÌŒ´“_À•W
+	D3DXMATRIX worldOffset;						// ãƒãƒªã‚´ãƒ³ã®é…ç½®åº§æ¨™
+	D3DXMATRIX localScale;						// ãƒãƒªã‚´ãƒ³ã®å¤§ãã• (æ‹¡å¤§å€ç‡
+	D3DXMATRIX localOffset;						// ãƒãƒªã‚´ãƒ³ã®åŸç‚¹åº§æ¨™
 	D3DXMATRIX localMat;
 	D3DXMATRIX world;
 
-	// ¶èÀ•WŒn³Ë‰es—ñ‚ğİ’è
+	// å·¦æ‰‹åº§æ¨™ç³»æ­£å°„å½±è¡Œåˆ—ã‚’è¨­å®š
 	D3DXMATRIX ortho;
 	D3DXMatrixOrthoLH(&ortho, (float)m_iDrawWidth, (float)m_iDrawHeight, 0.0f, 1000.0f);
 	m_pD3DDevice->SetTransform(D3DTS_PROJECTION, &ortho);
 
-	// ƒ[ƒ‹ƒhƒrƒ…[Ë‰e•ÏŠ·s—ñ‚ğì¬
-	D3DXMatrixScaling(&localScale, resultSizeW, resultSizeH, 1.0f);				// ƒ|ƒŠƒSƒ“‚ğ•¶š‚Ì‘å‚«‚³‚É‚·‚é
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ“ãƒ¥ãƒ¼å°„å½±å¤‰æ›è¡Œåˆ—ã‚’ä½œæˆ
+	D3DXMatrixScaling(&localScale, resultSizeW, resultSizeH, 1.0f);				// ãƒãƒªã‚´ãƒ³ã‚’æ–‡å­—ã®å¤§ãã•ã«ã™ã‚‹
 	D3DXMatrixTranslation(&localOffset, -resultSizeW/2.0f, +resultSizeH/2.0f, 0.0f);
 	localMat = localScale*localOffset;
 	D3DXMatrixTranslation(&worldOffset, (drawArea.left + drawArea.right)/2.0f -0.5f, (drawArea.top + drawArea.bottom)/2.0f +0.5f, 0.0f);
@@ -634,7 +634,7 @@ void DirectXMovie::Clear(void) {
 	// Shut down the graph
 	if (!(!m_pMC)) m_pMC->Stop();
 
-	//ŠeíƒIƒuƒWƒFƒNƒg‚Ì‰ğ•ú
+	//å„ç¨®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®è§£æ”¾
 	if (!(!m_pMC)) m_pMC.Release();
 	if (!(!m_pME)) m_pME.Release();
 	if (!(!m_pMP)) m_pMP.Release();
@@ -644,7 +644,7 @@ void DirectXMovie::Clear(void) {
 	if (m_pD3DVertex != NULL) m_pD3DVertex.Release();
 }
 
-//ƒ€[ƒr[‚ÌƒCƒxƒ“ƒg‚ğæ“¾
+//ãƒ ãƒ¼ãƒ“ãƒ¼ã®ã‚¤ãƒ™ãƒ³ãƒˆã‚’å–å¾—
 VOID DirectXMovie::GetEvent(long* lEventCode, LONG_PTR *lParam1, LONG_PTR *lParam2, long msTimeout) {
 	m_pME->GetEvent(lEventCode, lParam1, lParam2, msTimeout);
 }
