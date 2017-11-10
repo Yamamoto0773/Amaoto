@@ -16,7 +16,7 @@ private:
 	static int iCursor1;
 	static int iCursor2;
 
-	HighPrecisionTimer cSceneTime;
+	HighPrecisionTimer cSceneTime;	// 1画面中の処理が始まってからの経過時間
 	static CDDPro90 *dd;
 	static CDSPro81 *ds;
 	static GameController *cController;
@@ -32,8 +32,6 @@ private:
 	
 	
 
-private:
-	
 public:
 	GameScene();
 	virtual ~GameScene();
