@@ -37,7 +37,7 @@ public:
 	static const int GetKeyCount() { return KEYCOUNT; };
 	
 	// クラスの初期化
-	bool Init(HWND hnd, HINSTANCE hInstance);
+	bool Init(HWND hWnd, HINSTANCE hInstance);
 
 	// 入力状態の更新
 	bool Update();
