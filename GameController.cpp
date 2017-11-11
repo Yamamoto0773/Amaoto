@@ -1,13 +1,16 @@
 ﻿#include "GameController.hpp"
 
+using namespace std;
 
 GameController::GameController() {
 
 }
 
+
 GameController::~GameController() {
 	Clear();
 }
+
 
 bool GameController::Init(HWND hWnd, HINSTANCE hInstance) {
 	// DirectInput生成
@@ -104,11 +107,107 @@ bool GameController::Update() {
 	return true;
 }
 
-void GameController::GetKeyState(bool* hold, bool* pressed) {
 
+bool GameController::AddCustomKey(string name, int keyID) {
+	if (keyID < 0 || keyID >= KEYCOUNT) return false;
+
+	int index = -1;
+	for (int i=0; i<customKey.size(); i++) {
+		if (name == customKey[i].name) {
+			index = i;
+			break;
+		}
+	}
+
+	if (index == -1) {
+		CUSTOMKEY add;
+		add.name = name;
+		add.key.push_back(keyID);
+
+		customKey.push_back(add);
+	}
+	else {
+		customKey[index].key.push_back(keyID);
+	}
+	
+	return true;
+}
+
+
+bool GameController::DeleteCustomKey(std::string name) {
+	bool res = false;
+
+	for (auto it = customKey.cbegin(); it != customKey.cend(); ++it) {
+		if (it->name == name) {
+			customKey.erase(it);
+			res = true;
+			break;
+		}
+	}
+
+	return res;
+}
+
+
+bool GameController::IsKeyOn(std::string name) const {
+	auto access = customKey.cend();
+
+	for (auto it = customKey.cbegin(); it != customKey.end(); ++it) {
+		if (name == it->name) {
+			access = it;
+			break;
+		}
+	}
+
+	if (access == customKey.cend()) {
+		// 指定した名前のカスタムキーがなかった
+		return false;
+	}
+	else {
+
+		for (int i=0; i<access->key.size(); i++) {
+			if (IsKeyOn(access->key[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+}
+
+
+bool GameController::IsKeyPressed(std::string name) const {
+	auto access = customKey.cend();
+
+	for (auto it = customKey.cbegin(); it != customKey.end(); ++it) {
+		if (name == it->name) {
+			access = it;
+			break;
+		}
+	}
+
+	if (access == customKey.cend()) {
+		// 指定した名前のカスタムキーがなかった
+		return false;
+	}
+	else {
+
+		for (int i=0; i<access->key.size(); i++) {
+			if (IsKeyPressed(access->key[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+}
+
+
+void GameController::GetKeyState(bool* hold, bool* pressed) {
 	memcpy(hold, bIsKeyOn, sizeof(bool)*KEYCOUNT);
 	memcpy(pressed, bIsKeyPressed, sizeof(bool)*KEYCOUNT);
 }
+
 
 const bool GameController::IsKeyOn(int num) const {
 	if (num < 0 || num >= KEYCOUNT)	return false;
@@ -116,11 +215,13 @@ const bool GameController::IsKeyOn(int num) const {
 	return bIsKeyOn[num];
 }
 
+
 const bool GameController::IsKeyPressed(int num) const {
 	if (num < 0 || num >= KEYCOUNT)	return false;
 
 	return bIsKeyPressed[num];
 }
+
 
 bool GameController::Clear() {
 
