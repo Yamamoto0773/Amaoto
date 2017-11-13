@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 
-#include "libfiles/CDIPro81.h"
-#include "libfiles/MIDIinput.h"
+#include "CDIPro81.h"
+#include "MIDIinput.h"
 #include <vector>
 #include <string>
 

@@ -1,14 +1,14 @@
 ﻿#pragma once
 
 
-#include "GameController.hpp"
-#include "HighPrecisionTimer.hpp"
-#include "libfiles/CDSPro81.h"
-#include "libfiles/DirectXText.h"
-#include "libfiles/CDDPro90.h"
-#include "libfiles/CDSPro81.h"
-#include "libfiles/CBmsPro.h"
-#include "GameController.hpp"
+#include "../libfiles/GameController.hpp"
+#include "../libfiles/HighPrecisionTimer.hpp"
+#include "../libfiles/CDSPro81.h"
+#include "../libfiles/DirectXText.h"
+#include "../libfiles/CDDPro90.h"
+#include "../libfiles/CDSPro81.h"
+#include "../libfiles/CBmsPro.h"
+#include "../libfiles/GameController.hpp"
 
 
 class GameScene {
