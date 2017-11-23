@@ -1,17 +1,19 @@
 ﻿#include "HighPrecisionTimer.hpp"
 
 HighPrecisionTimer::HighPrecisionTimer() {
-	llStartCount.QuadPart = 0;
-	llPauseStCount.QuadPart = 0;
-	llFrequency.QuadPart = 0;
+	llStartCount = 0;
+	llPauseStCount = 0;
+	llFrequency = 0;
 
 	bIsPaused = true;
 	bIsReset = true;
 	dTime = 0.0;
 
 	// 周波数を取得
-	if (QueryPerformanceFrequency(&llFrequency)) {
+	LARGE_INTEGER freq;
+	if (QueryPerformanceFrequency(&freq)) {
 		bIsHighPrecValid = true;
+		llFrequency = freq.QuadPart;
 	}
 	else {
 		/*
@@ -19,7 +21,7 @@ HighPrecisionTimer::HighPrecisionTimer() {
 		その際、精度を1msで取得するので周波数を1000Hzに設定します。
 		*/
 
-		llFrequency.QuadPart = 1000LL;
+		llFrequency = 1000LL;
 		bIsHighPrecValid = false;
 	}
 }
@@ -32,25 +34,13 @@ HighPrecisionTimer::~HighPrecisionTimer() {
 void HighPrecisionTimer::Start() {
 
 	if (bIsPaused) {
-		LARGE_INTEGER now;
-
-		// 現在のカウントを取得
-		if (bIsHighPrecValid) {
-			QueryPerformanceCounter(&now);
-		}
-		else {
-			timeBeginPeriod(1);
-			now.QuadPart = (long long)timeGetTime();
-			timeEndPeriod(1);
-		}
-
 		// タイマー開始の時間を変更
 		if (bIsReset) {
-			llStartCount.QuadPart = now.QuadPart;
+			llStartCount = _GetNowCount();
 		}
 		else {
 			// 一時停止した時間分だけずらす
-			llStartCount.QuadPart += now.QuadPart - llPauseStCount.QuadPart;
+			llStartCount += _GetNowCount() - llPauseStCount;
 		}
 
 		bIsPaused = false;
@@ -70,17 +60,10 @@ void HighPrecisionTimer::Pause() {
 	else {
 
 		// 一時停止開始時のカウントを取得
-		if (bIsHighPrecValid) {
-			QueryPerformanceCounter(&llPauseStCount);
-		}
-		else {
-			timeBeginPeriod(1);
-			llPauseStCount.QuadPart = (long long)timeGetTime();
-			timeEndPeriod(1);
-		}
+		llPauseStCount = _GetNowCount();
 
 		// 一時停止時のタイムを保存
-		dTime = (double)(llPauseStCount.QuadPart - llStartCount.QuadPart)/llFrequency.QuadPart;
+		dTime = (double)(llPauseStCount - llStartCount)/llFrequency;
 
 		bIsPaused = true;
 	}
@@ -99,7 +82,6 @@ void HighPrecisionTimer::Reset() {
 		一時停止中でないと動作しません
 		*/
 	}
-
 }
 
 
@@ -108,18 +90,27 @@ double HighPrecisionTimer::GetTime() {
 	if (bIsPaused == false) {
 
 		// タイムを更新
-		LARGE_INTEGER now;
-		if (bIsHighPrecValid) {
-			QueryPerformanceCounter(&now);
-		}
-		else {
-			timeBeginPeriod(1);
-			now.QuadPart = timeGetTime();
-			timeEndPeriod(1);
-		}
-
-		dTime = (double)(now.QuadPart - llStartCount.QuadPart)/llFrequency.QuadPart;
+		dTime = (double)(_GetNowCount() - llStartCount)/llFrequency;
 	}
 
 	return dTime;
+}
+
+
+
+
+long long HighPrecisionTimer::_GetNowCount() {
+	LARGE_INTEGER now;
+
+	// 現在のカウントを取得
+	if (bIsHighPrecValid) {
+		QueryPerformanceCounter(&now);
+	}
+	else {
+		timeBeginPeriod(1);
+		now.QuadPart = (long long)timeGetTime();
+		timeEndPeriod(1);
+	}
+
+	return now.QuadPart;
 }

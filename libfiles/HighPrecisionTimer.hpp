@@ -19,10 +19,10 @@ HighPrecisionTimerクラス
 
 class HighPrecisionTimer {
 private:
-	LARGE_INTEGER llFrequency;
+	long long llFrequency;
 
-	LARGE_INTEGER llStartCount;
-	LARGE_INTEGER llPauseStCount;
+	long long llStartCount;
+	long long llPauseStCount;
 
 	double dTime;
 
@@ -35,12 +35,6 @@ public:
 	HighPrecisionTimer();
 	~HighPrecisionTimer();
 
-	// 高精度タイマーが有効かどうかを返す
-	bool IsHighPrecisionValid() { return bIsHighPrecValid; }
-
-	// タイマーの分解能を返す
-	long long GetResolutionFreq() { return llFrequency.QuadPart; }
-
 	// タイマーをスタート
 	void Start();
 
@@ -52,4 +46,15 @@ public:
 
 	// 時間を取得
 	double GetTime();
+
+
+	// 高精度タイマーが有効かどうかを返す
+	bool _IsHighPrecisionValid() { return bIsHighPrecValid; }
+
+	// タイマーの分解能を返す
+	long long _GetResolutionFreq() { return llFrequency; }
+
+	// 現在のシステムのカウント値を返す
+	long long _GetNowCount();
+
 };
