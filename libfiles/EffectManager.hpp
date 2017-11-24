@@ -1,13 +1,13 @@
 #pragma once
 
 /*
-EffectManager�N���X
+EffectManagerクラス
 
-�G�t�F�N�g�`��Ȃǂɗp����J�E���^���ȒP�ɊǗ��ł���N���X�ł��B
-�w�肵�����Ԃ̊ԁA�G�t�F�N�g��`�悵�܂��B
+エフェクト描画などに用いるカウンタを簡単に管理できるクラスです。
+指定した時間の間、エフェクトを描画します。
 
-�쐬��:�R�{���C
-�쐬����:2017/11/13
+作成者:山本七海
+作成日時:2017/11/13
 */
 
 
@@ -25,8 +25,8 @@ struct EFFECTTIME {
 };
 
 struct DRAWEFFECTPARAM {
-	float alpha;	// ����:0.0f �s����:1.0f
-	float scale;	// ���{�\��:1.0f
+	float alpha;	// 透明:0.0f 不透明:1.0f
+	float scale;	// 等倍表示:1.0f
 	float offsetX;
 	float offsetY;
 };
@@ -51,21 +51,21 @@ public:
 	
 
 	/*
-	�}�l�[�W���𐶐�
-	changeDrawingFunc�ɂ�,�G�t�F�N�g���ǂ̂悤�ɕω������ĕ`�悷�邩���`�����֐���n���܂��B
-	�����ɂ́A�G�t�F�N�g�̌o�ߎ��Ԃ�0.0f-1.0f�œn����܂��B
+	マネージャを生成
+	changeDrawingFuncには,エフェクトをどのように変化させて描画するかを定義した関数を渡します。
+	引数には、エフェクトの経過時間が0.0f-1.0fで渡されます。
 	*/
 	void Create(wchar_t fileName, const draweffectoption_func& changeDrawingFunc, double timeLength, unsigned int element=50);
 
-	// �G�t�F�N�g�J�n
+	// エフェクト開始
 	void Start(float x, float y);
 
-	// �w�肵�������ŃG�t�F�N�g���J�n
+	// 指定した長さでエフェクトを開始
 	void Start(float x, float y, double timeLength);
 
-	// �G�t�F�N�g��`��
+	// エフェクトを描画
 	bool Draw() const;
 
-	// �S�G�t�F�N�g�����Z�b�g
+	// 全エフェクトをリセット
 	void Reset();
 };
