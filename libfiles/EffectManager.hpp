@@ -10,7 +10,7 @@ EffectManagerクラス
 作成日時:2017/11/13
 */
 
-
+#include <d3d9.h>
 #include <vector>
 #include <functional>
 #include <Windows.h>
@@ -35,12 +35,33 @@ typedef std::function<DRAWEFFECTPARAM(float)> draweffectoption_func;
 
 
 class EffectManager {
+	typedef struct _POINT {
+		int x, y;
+	}POINT;
+
+	typedef struct _SIZE {
+		int w, h;
+	}SIZE;
+	
+	typedef struct _PUTTEXINFO {
+		int x, y;
+		int w, h;
+	}PUTTEXINFO;
+
 private:
+	IDirect3DDevice9 *lpDev;
+	IDirect3DTexture9 *lpTex;
+
 	HighPrecisionTimer timer;
 
 	std::vector<EFFECTTIME> effect;
-	unsigned long dTimeLength;
+	unsigned long ulTimeLength;
 	unsigned int uiIndex;
+
+	SIZE mTexSize;
+	PUTTEXINFO mPutTexInfo;
+
+
 
 public:
 	EffectManager();
@@ -55,7 +76,22 @@ public:
 	changeDrawingFuncには,エフェクトをどのように変化させて描画するかを定義した関数を渡します。
 	引数には、エフェクトの経過時間が0.0f-1.0fで渡されます。
 	*/
-	void Create(wchar_t fileName, const draweffectoption_func& changeDrawingFunc, double timeLength, unsigned int element=50);
+	void Create(
+		const draweffectoption_func& changeDrawingFunc,
+		double timeLength,
+		unsigned int element=50
+	);
+
+	// エフェクト画像を登録
+	bool SetEffectImg(
+		IDirect3DDevice9 *lpDev,
+		wchar_t *ImgFileName,
+		int x,
+		int y,
+		int w,
+		int h
+	);
+
 
 	// エフェクト開始
 	void Start(float x, float y);
@@ -68,4 +104,9 @@ public:
 
 	// 全エフェクトをリセット
 	void Reset();
+
+
+private:
+	CreateTexture(wchar_t *fileName);
+
 };
