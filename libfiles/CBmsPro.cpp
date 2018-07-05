@@ -627,7 +627,7 @@ BOOL CBmsPro::LoadObjeData(DIFFICULTY diff) {
 						j--;
 					}
 
-					char *pattern[] ={ "avi", "mp4", "m4a", "mov", "qt", "m2ts", "ts", "mpeg", "mpg",
+					const char *pattern[] ={ "avi", "mp4", "m4a", "mov", "qt", "m2ts", "ts", "mpeg", "mpg",
 					"mkv", "wmv", "asf", "flv", "f4v", "asf", "webm", "ogm", "bmp", "tga", "dds", "dib", "jpg", "png" };
 					for (i=0; i<23; i++) {
 						if (strnicmp(tmp, pattern[i], 3) == 0) break;
