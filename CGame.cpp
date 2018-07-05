@@ -235,6 +235,11 @@ bool CGame::Init(HINSTANCE hinst) {
 	QueryPerformanceFrequency(&freq);
 	llGlobalFreq = freq.QuadPart;
 
+
+	bool isvalid = hptimer._IsHighPrecisionValid();
+
+	
+
 	// タイマー初期化
 	tm.Start(60);
 
@@ -506,9 +511,11 @@ int CGame::RunTitle() {
 	int i, j, k;
 
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+
+	dElapsedTime = hptimer.GetTime();
 
 
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -690,9 +697,12 @@ int CGame::RunTitle() {
 int CGame::RunPlayMusicMode(long musicID, bool demo) {
 
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+
+	dElapsedTime = hptimer.GetTime();
+
 
 	// テンポラリ変数
 	int i, j, k;
@@ -1462,9 +1472,11 @@ int CGame::RunMusicSelectionMode() {
 
 
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+
+	dElapsedTime = hptimer.GetTime();
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	// 入力処理関係
@@ -1792,10 +1804,11 @@ int CGame::RunDifficultySelectionMode() {
 	int i, j, k;
 
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
 
+	dElapsedTime = hptimer.GetTime();
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	// 入力処理関係
@@ -2145,10 +2158,11 @@ int CGame::RunResultMode() {
 
 
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
 
+	dElapsedTime = hptimer.GetTime();
 
 	if (dElapsedTime > 15.0) {
 		// 15秒経つと自動で画面遷移する
@@ -2435,9 +2449,11 @@ bool CGame::ExitPlayMusicMode() {
 
 bool CGame::RunScreenTransition(double stime) {
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	
+	dElapsedTime = hptimer.GetTime();
 
 	if (dElapsedTime > stime) {
 		return 1;
@@ -2582,9 +2598,14 @@ bool CGame::Run(HINSTANCE hinst) {
 					eState = G_TITLE;
 
 					// 現在の時間を開始時間とする
-					LARGE_INTEGER li;
-					QueryPerformanceCounter(&li);
-					llStartTime = li.QuadPart;
+					//LARGE_INTEGER li;
+					//QueryPerformanceCounter(&li);
+					//llStartTime = li.QuadPart;
+
+					hptimer.Pause();
+					hptimer.Reset();
+					hptimer.Start();
+
 				}
 
 			case G_TITLE:
@@ -2597,9 +2618,13 @@ bool CGame::Run(HINSTANCE hinst) {
 						eState = G_TITLEFADEOUT;
 
 						// 現在の時間を開始時間とする
-						LARGE_INTEGER li;
-						QueryPerformanceCounter(&li);
-						llStartTime = li.QuadPart;
+						//LARGE_INTEGER li;
+						//QueryPerformanceCounter(&li);
+						//llStartTime = li.QuadPart;
+
+						hptimer.Pause();
+						hptimer.Reset();
+						hptimer.Start();
 
 						break;
 					case 1:
@@ -2629,9 +2654,14 @@ bool CGame::Run(HINSTANCE hinst) {
 					eState = G_SELECTMUSIC;
 
 					// 現在の時間を開始時間とする
-					LARGE_INTEGER li;
-					QueryPerformanceCounter(&li);
-					llStartTime = li.QuadPart;
+					//LARGE_INTEGER li;
+					//QueryPerformanceCounter(&li);
+					//llStartTime = li.QuadPart;
+
+					hptimer.Pause();
+					hptimer.Reset();
+					hptimer.Start();
+
 				}
 
 				break;
@@ -2663,9 +2693,13 @@ bool CGame::Run(HINSTANCE hinst) {
 						eState = G_SELECTDIFFICULTY;
 
 						// 現在の時間を開始時間とする
-						LARGE_INTEGER li;
-						QueryPerformanceCounter(&li);
-						llStartTime = li.QuadPart;
+						//LARGE_INTEGER li;
+						//QueryPerformanceCounter(&li);
+						//llStartTime = li.QuadPart;
+
+						hptimer.Pause();
+						hptimer.Reset();
+						hptimer.Start();
 
 						break;
 					default:
@@ -2683,9 +2717,13 @@ bool CGame::Run(HINSTANCE hinst) {
 						eState = G_SELECTDIFFFADEOUT;
 
 						// 現在の時間を開始時間とする
-						LARGE_INTEGER li;
-						QueryPerformanceCounter(&li);
-						llStartTime = li.QuadPart;
+						//LARGE_INTEGER li;
+						//QueryPerformanceCounter(&li);
+						//llStartTime = li.QuadPart;
+						
+						hptimer.Pause();
+						hptimer.Reset();
+						hptimer.Start();
 
 						break;
 					case 1:
@@ -2741,9 +2779,13 @@ bool CGame::Run(HINSTANCE hinst) {
 						Sleep(100);		// 前処理が確実に終わるように、少しだけ待機
 
 						// 現在の時間を開始時間とする
-						LARGE_INTEGER li;
-						QueryPerformanceCounter(&li);
-						llStartTime = li.QuadPart;
+						//LARGE_INTEGER li;
+						//QueryPerformanceCounter(&li);
+						//llStartTime = li.QuadPart;
+
+						hptimer.Pause();
+						hptimer.Reset();
+						hptimer.Start();
 
 						break;
 					default:
@@ -2775,10 +2817,13 @@ bool CGame::Run(HINSTANCE hinst) {
 						eState = G_RESULT;
 
 						// 現在の時間を開始時間とする
-						LARGE_INTEGER li;
-						QueryPerformanceCounter(&li);
-						llStartTime = li.QuadPart;
+						//LARGE_INTEGER li;
+						//QueryPerformanceCounter(&li);
+						//llStartTime = li.QuadPart;
 
+						hptimer.Pause();
+						hptimer.Reset();
+						hptimer.Start();
 
 						break;
 				}
