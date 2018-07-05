@@ -1,4 +1,4 @@
-#include "DirectXFigure.h"
+ï»¿#include "DirectXFigure.h"
 
 
 #define SAFE_RELEASE(x) { if(x){ x->Release(); x=NULL; } }
@@ -13,13 +13,13 @@ DirectXFigure::DirectXFigure() {
 	bStroke			= TRUE;
 	bAntialias		= FALSE;
 	fStrokeWeight	= 1.0f;
-	dwStrokeColor	= 0xffffffff;	// •s“§–¾‚Ì”’
+	dwStrokeColor	= 0xffffffff;	// ä¸é€æ˜ã®ç™½
 	dwFillColor		= 0xffffffff;
 
 }
 
 DirectXFigure::~DirectXFigure() {
-	SAFE_RELEASE( pVertex );											// ‰ğ•ú
+	SAFE_RELEASE( pVertex );											// è§£æ”¾
 	SAFE_RELEASE( pLine );
 
 	lpDev = NULL;
@@ -38,7 +38,7 @@ BOOL DirectXFigure::Init( LPDIRECT3DDEVICE9 dev ) {
 	lpDev = dev;
 
 	HRESULT hr;
-	hr = lpDev->CreateVertexBuffer( sizeof( D3DVERTEX )*(MAX_VERTEX*2+2), D3DUSAGE_DYNAMIC, D3DFVF_2DVERTEX, D3DPOOL_DEFAULT, &pVertex, NULL );	// ’¸“_ƒoƒbƒtƒ@ì¬
+	hr = lpDev->CreateVertexBuffer( sizeof( D3DVERTEX )*(MAX_VERTEX*2+2), D3DUSAGE_DYNAMIC, D3DFVF_2DVERTEX, D3DPOOL_DEFAULT, &pVertex, NULL );	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ä½œæˆ
 	if (FAILED(hr))
 		return FALSE;
 
@@ -129,15 +129,15 @@ BOOL DirectXFigure::line( float x1, float y1, float x2, float y2 ) {
 		return FALSE;
 
 	if (bStroke) {
-		// —ÖŠsü‚Ì•`‰æ‚ªon‚È‚ç
+		// è¼ªéƒ­ç·šã®æç”»ãŒonãªã‚‰
 
-		// ’¸“_ƒf[ƒ^ì¬ 
+		// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ä½œæˆ 
 		D3DXVECTOR2 vec[2] ={
-			{x1-0.5f, y1-0.5f},		// ƒ‰ƒXƒ^ƒ‰ƒCƒ[[ƒVƒ‡ƒ“ƒ‹[ƒ‹‚ª‚ ‚é‚½‚ß’¸“_ˆÊ’u‚ğ‚¸‚ç‚·
+			{x1-0.5f, y1-0.5f},		// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¼ãƒ¼ã‚·ãƒ§ãƒ³ãƒ«ãƒ¼ãƒ«ãŒã‚ã‚‹ãŸã‚é ‚ç‚¹ä½ç½®ã‚’ãšã‚‰ã™
 			{x2-0.5f, y2-0.5f}
 		};
 
-		// •`‰æ
+		// æç”»
 		pLine->Begin();
 		pLine->Draw( vec, 2, dwStrokeColor );
 		pLine->End();
@@ -156,11 +156,11 @@ BOOL DirectXFigure::rect( float x, float y, float w, float h ) {
 	if (w == 0 || h==0)
 		return FALSE;
 
-	lpDev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );				// ¶èŒn
+	lpDev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );				// å·¦æ‰‹ç³»
 	lpDev->SetFVF( D3DFVF_2DVERTEX );
-	lpDev->SetTexture(0, NULL);											// ƒ|ƒŠƒSƒ“‚¾‚¯‚ğ•`‰æ
+	lpDev->SetTexture(0, NULL);											// ãƒãƒªã‚´ãƒ³ã ã‘ã‚’æç”»
 
-	x-=0.5, y-=0.5;		// ƒ‰ƒXƒ^ƒ‰ƒCƒ[[ƒVƒ‡ƒ“ƒ‹[ƒ‹‚Ì‚½‚ß’¸“_ˆÊ’u‚ğ‚¸‚ç‚· 
+	x-=0.5, y-=0.5;		// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¼ãƒ¼ã‚·ãƒ§ãƒ³ãƒ«ãƒ¼ãƒ«ã®ãŸã‚é ‚ç‚¹ä½ç½®ã‚’ãšã‚‰ã™ 
 	Point pt[4] ={
 		{x, y},
 		{x+w, y},
@@ -169,47 +169,47 @@ BOOL DirectXFigure::rect( float x, float y, float w, float h ) {
 	};
 
 	if (bFill) {
-		// “h‚è‚Â‚Ô‚µ‚ªon‚È‚ç
+		// å¡—ã‚Šã¤ã¶ã—ãŒonãªã‚‰
 		void *pData = NULL;
 
 		D3DVERTEX v[4] ={
-			{(float)pt[0].x, (float)pt[0].y, 0.0f, 1.0f, dwFillColor},	// ¶ã
-			{(float)pt[1].x, (float)pt[1].y, 0.0f, 1.0f, dwFillColor},	// ‰Eã
-			{(float)pt[2].x, (float)pt[2].y, 0.0f, 1.0f, dwFillColor},	// ¶‰º
-			{(float)pt[3].x, (float)pt[3].y, 0.0f, 1.0f, dwFillColor}	// ‰E‰º
+			{(float)pt[0].x, (float)pt[0].y, 0.0f, 1.0f, dwFillColor},	// å·¦ä¸Š
+			{(float)pt[1].x, (float)pt[1].y, 0.0f, 1.0f, dwFillColor},	// å³ä¸Š
+			{(float)pt[2].x, (float)pt[2].y, 0.0f, 1.0f, dwFillColor},	// å·¦ä¸‹
+			{(float)pt[3].x, (float)pt[3].y, 0.0f, 1.0f, dwFillColor}	// å³ä¸‹
 		};
 
-		if (FAILED(pVertex->Lock( 0, sizeof( D3DVERTEX )*4, (void**)&pData, 0 )))	// ’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN
+		if (FAILED(pVertex->Lock( 0, sizeof( D3DVERTEX )*4, (void**)&pData, 0 )))	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ãƒ­ãƒƒã‚¯
 			return FALSE;
-		memcpy( pData, v, sizeof( D3DVERTEX )*4 );							// ’¸“_ƒoƒbƒtƒ@‚É’¸“_À•W‚ğ‘‚«‚İ
-		pVertex->Unlock();													// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN
+		memcpy( pData, v, sizeof( D3DVERTEX )*4 );							// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã«é ‚ç‚¹åº§æ¨™ã‚’æ›¸ãè¾¼ã¿
+		pVertex->Unlock();													// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ã‚¢ãƒ³ãƒ­ãƒƒã‚¯
 		
 		lpDev->SetStreamSource( 0, pVertex, 0, sizeof( D3DVERTEX ) );
-		lpDev->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2 );					// •`‰æ
+		lpDev->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 2 );					// æç”»
 	}
 
 
 	if (bStroke) {
-		// —ÖŠsü‚Ì•`‰æ‚ªon‚È‚ç
+		// è¼ªéƒ­ç·šã®æç”»ãŒonãªã‚‰
 		Point gpt;
 
-		// dS‚ğ‹‚ß‚é
+		// é‡å¿ƒã‚’æ±‚ã‚ã‚‹
 		gpt.x = fabs(pt[1].x+pt[0].x)/2.0;
 		gpt.y = fabs(pt[2].y+pt[1].y)/2.0;
 		
 		for (int i=0; i<4; i++)
-			pt[i].x -= gpt.x, pt[i].y -= gpt.y;								//’¸“_À•W‚ÌŒ´“_‚ğ‚¸‚ç‚·
+			pt[i].x -= gpt.x, pt[i].y -= gpt.y;								//é ‚ç‚¹åº§æ¨™ã®åŸç‚¹ã‚’ãšã‚‰ã™
 
-		Point scale1, scale2;	// Šg‘åAk¬”{—¦
+		Point scale1, scale2;	// æ‹¡å¤§ã€ç¸®å°å€ç‡
 		scale1.x = (fabs(pt[0].x)+fStrokeWeight/2)/(fabs(pt[0].x));
 		scale1.y = (fabs(pt[0].y)+fStrokeWeight/2)/(fabs(pt[0].y));
 		scale2.x = (fabs(pt[0].x)-fStrokeWeight/2)/(fabs(pt[0].x));
 		scale2.y = (fabs(pt[0].y)-fStrokeWeight/2)/(fabs(pt[0].y));
 
 		Point temp;
-		temp = pt[2], pt[2] = pt[3], pt[3] = temp;							// ’¸“_’è‹`‚Ì‡”Ô‚ğ•ÏX
+		temp = pt[2], pt[2] = pt[3], pt[3] = temp;							// é ‚ç‚¹å®šç¾©ã®é †ç•ªã‚’å¤‰æ›´
 
-		// —ÖŠsü‚ÌÀ•W‚ğŠi”[
+		// è¼ªéƒ­ç·šã®åº§æ¨™ã‚’æ ¼ç´
 		D3DVERTEX v[10];
 		for (int i=0; i<8; i++) {
 			if (i%2 == 0)	v[i] ={ (float)(pt[i/2].x*scale2.x +gpt.x), (float)(pt[i/2].y*scale2.y +gpt.y), 0.0f, 1.0f, dwStrokeColor };
@@ -218,10 +218,10 @@ BOOL DirectXFigure::rect( float x, float y, float w, float h ) {
 		v[8] = v[0], v[9] = v[1];
 
 		void *pData;
-		if  (FAILED(pVertex->Lock( 0, sizeof( D3DVERTEX )*10, (void**)&pData, 0 )))	// ’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN
+		if  (FAILED(pVertex->Lock( 0, sizeof( D3DVERTEX )*10, (void**)&pData, 0 )))	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ãƒ­ãƒƒã‚¯
 			return FALSE;
-		memcpy( pData, v, sizeof( D3DVERTEX )*10 );							// ’¸“_ƒoƒbƒtƒ@‚É’¸“_À•W‚ğ‘‚«‚İ
-		pVertex->Unlock();													// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN
+		memcpy( pData, v, sizeof( D3DVERTEX )*10 );							// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã«é ‚ç‚¹åº§æ¨™ã‚’æ›¸ãè¾¼ã¿
+		pVertex->Unlock();													// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ã‚¢ãƒ³ãƒ­ãƒƒã‚¯
 
 		lpDev->SetStreamSource( 0, pVertex, 0, sizeof( D3DVERTEX ) );
 		lpDev->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, 8 );
@@ -241,11 +241,11 @@ BOOL DirectXFigure::ellipse(float x, float y, float w, float h, int vertexCnt) {
 	if (w == 0 || h==0)
 		return FALSE;
 
-	lpDev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );				// ¶èŒn
+	lpDev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );				// å·¦æ‰‹ç³»
 	lpDev->SetFVF( D3DFVF_2DVERTEX );
-	lpDev->SetTexture(0, NULL);											// ƒ|ƒŠƒSƒ“‚¾‚¯‚ğ•`‰æ
+	lpDev->SetTexture(0, NULL);											// ãƒãƒªã‚´ãƒ³ã ã‘ã‚’æç”»
 
-	x-=0.5, y-=0.5;		// ƒ‰ƒXƒ^ƒ‰ƒCƒ[[ƒVƒ‡ƒ“ƒ‹[ƒ‹‚Ì‚½‚ß’¸“_ˆÊ’u‚ğ‚¸‚ç‚· 
+	x-=0.5, y-=0.5;		// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¼ãƒ¼ã‚·ãƒ§ãƒ³ãƒ«ãƒ¼ãƒ«ã®ãŸã‚é ‚ç‚¹ä½ç½®ã‚’ãšã‚‰ã™ 
 
 	D3DVERTEX *v = NULL;
 	v = (D3DVERTEX*)malloc(sizeof(D3DVERTEX)*(vertexCnt+2));
@@ -262,35 +262,35 @@ BOOL DirectXFigure::ellipse(float x, float y, float w, float h, int vertexCnt) {
 
 	
 	if (bFill) {
-		// “h‚è‚Â‚Ô‚µ‚ªon‚È‚ç
+		// å¡—ã‚Šã¤ã¶ã—ãŒonãªã‚‰
 
 		void *pData = NULL;
 		if (FAILED(pVertex->Lock(0, sizeof(D3DVERTEX)*(vertexCnt+2), (void**)&pData, 0))) {
 			SAFE_FREE(v);
 			return FALSE;
 		}
-		memcpy( pData, v, sizeof( D3DVERTEX )*(vertexCnt+2) );				// ’¸“_ƒoƒbƒtƒ@‚É’¸“_À•W‚ğ‘‚«‚İ
+		memcpy( pData, v, sizeof( D3DVERTEX )*(vertexCnt+2) );				// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã«é ‚ç‚¹åº§æ¨™ã‚’æ›¸ãè¾¼ã¿
 		pVertex->Unlock();													
 
 		lpDev->SetStreamSource( 0, pVertex, 0, sizeof( D3DVERTEX ) );
-		lpDev->DrawPrimitive( D3DPT_TRIANGLEFAN, 0, vertexCnt);			// •`‰æ
+		lpDev->DrawPrimitive( D3DPT_TRIANGLEFAN, 0, vertexCnt);			// æç”»
 	}
 
 
 	if (bStroke) {
-		// —ÖŠsü‚Ì•`‰æ‚ªon‚È‚ç
+		// è¼ªéƒ­ç·šã®æç”»ãŒonãªã‚‰
 		
 		D3DVERTEX *pLineV = NULL;
 		pLineV = (D3DVERTEX*)malloc(sizeof(D3DVERTEX)*(vertexCnt*2+2));
 		
-		Point scale1, scale2;	// Šg‘åAk¬”{—¦
+		Point scale1, scale2;	// æ‹¡å¤§ã€ç¸®å°å€ç‡
 		scale1.x = (w+fStrokeWeight/2)/w;
 		scale1.y = (h+fStrokeWeight/2)/h;
 		scale2.x = (w-fStrokeWeight/2)/w;
 		scale2.y = (h-fStrokeWeight/2)/h;
 
 		for (i=0; i<vertexCnt+2; i++)
-			v[i].x -= x, v[i].y -= y;	// ‰~‚Ì’†S‚ğŒ´“_‚É‡‚í‚¹‚é
+			v[i].x -= x, v[i].y -= y;	// å††ã®ä¸­å¿ƒã‚’åŸç‚¹ã«åˆã‚ã›ã‚‹
 
 		for (i=0; i<vertexCnt*2+2; i++) {
 			if (i%2 == 0)	pLineV[i] ={ (float)(v[1+i/2].x*scale2.x +x), (float)(v[1+i/2].y*scale2.y +y), 0.0f, 1.0f, dwStrokeColor };
@@ -298,12 +298,12 @@ BOOL DirectXFigure::ellipse(float x, float y, float w, float h, int vertexCnt) {
 		}
 
 		void *pData = NULL;
-		if (FAILED(pVertex->Lock(0, sizeof(D3DVERTEX)*(vertexCnt*2+2), (void**)&pData, 0))) {	// ’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN
+		if (FAILED(pVertex->Lock(0, sizeof(D3DVERTEX)*(vertexCnt*2+2), (void**)&pData, 0))) {	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ãƒ­ãƒƒã‚¯
 			SAFE_FREE(pLineV);
 			return FALSE;
 		}
-		memcpy( pData, pLineV, sizeof( D3DVERTEX )*(vertexCnt*2+2) );							// ’¸“_ƒoƒbƒtƒ@‚É’¸“_À•W‚ğ‘‚«‚İ
-		pVertex->Unlock();													// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN
+		memcpy( pData, pLineV, sizeof( D3DVERTEX )*(vertexCnt*2+2) );							// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã«é ‚ç‚¹åº§æ¨™ã‚’æ›¸ãè¾¼ã¿
+		pVertex->Unlock();													// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ã‚¢ãƒ³ãƒ­ãƒƒã‚¯
 
 		lpDev->SetStreamSource( 0, pVertex, 0, sizeof( D3DVERTEX ) );
 		lpDev->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, vertexCnt*2 );
@@ -325,7 +325,7 @@ BOOL DirectXFigure::quad( size_t _vertexCnt, ... ) {
 	if (!(3 < vertexCnt && vertexCnt < MAX_VERTEX))
 		return FALSE;
 
-	// -----------’¸“_ƒf[ƒ^Ši”[-------------------------
+	// -----------é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿æ ¼ç´-------------------------
 	Point *pPt = NULL;
 	pPt = (Point*)malloc(sizeof(Point)*vertexCnt);
 	va_list ap;
@@ -337,9 +337,9 @@ BOOL DirectXFigure::quad( size_t _vertexCnt, ... ) {
 	va_end( ap );
 	//---------------------------------------------------
 
-	lpDev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );				// ¶èŒn
+	lpDev->SetRenderState( D3DRS_CULLMODE, D3DCULL_CCW );				// å·¦æ‰‹ç³»
 	lpDev->SetFVF( D3DFVF_2DVERTEX );
-	lpDev->SetTexture(0, NULL);											// ƒ|ƒŠƒSƒ“‚¾‚¯‚ğ•`‰æ
+	lpDev->SetTexture(0, NULL);											// ãƒãƒªã‚´ãƒ³ã ã‘ã‚’æç”»
 	if (bAntialias)
 		lpDev->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, TRUE);
 	else
@@ -347,39 +347,39 @@ BOOL DirectXFigure::quad( size_t _vertexCnt, ... ) {
 
 
 	for (int i=0; i<vertexCnt; i++)
-		pPt[i].x -= 0.5, pPt[i].y -= 0.5;			// ƒ‰ƒXƒ^ƒ‰ƒCƒ[[ƒVƒ‡ƒ“ƒ‹[ƒ‹‚Ì‚½‚ß’¸“_ˆÊ’u‚ğ‚¸‚ç‚·
+		pPt[i].x -= 0.5, pPt[i].y -= 0.5;			// ãƒ©ã‚¹ã‚¿ãƒ©ã‚¤ã‚¼ãƒ¼ã‚·ãƒ§ãƒ³ãƒ«ãƒ¼ãƒ«ã®ãŸã‚é ‚ç‚¹ä½ç½®ã‚’ãšã‚‰ã™
 
 	if (bFill) {
-		// “h‚è‚Â‚Ô‚µ‚ªon‚È‚ç
+		// å¡—ã‚Šã¤ã¶ã—ãŒonãªã‚‰
 		void *pData = NULL;
 
-		// ’¸“_’è‹`
+		// é ‚ç‚¹å®šç¾©
 		D3DVERTEX *v = NULL;
 		v = (D3DVERTEX*)malloc(sizeof(D3DVERTEX)*vertexCnt);
 		for (int i=0; i<vertexCnt; i++)
 			v[i] = {(float)pPt[i].x, (float)pPt[i].y, 0.0f, 1.0f, dwFillColor};
 
-		if (FAILED(pVertex->Lock( 0, sizeof( D3DVERTEX )*vertexCnt, (void**)&pData, 0 )))	// ’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN
+		if (FAILED(pVertex->Lock( 0, sizeof( D3DVERTEX )*vertexCnt, (void**)&pData, 0 )))	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ãƒ­ãƒƒã‚¯
 			return FALSE;
-		memcpy( pData, v, sizeof( D3DVERTEX )*vertexCnt );							// ’¸“_ƒoƒbƒtƒ@‚É’¸“_À•W‚ğ‘‚«‚İ
-		pVertex->Unlock();															// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN
+		memcpy( pData, v, sizeof( D3DVERTEX )*vertexCnt );							// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã«é ‚ç‚¹åº§æ¨™ã‚’æ›¸ãè¾¼ã¿
+		pVertex->Unlock();															// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ã‚¢ãƒ³ãƒ­ãƒƒã‚¯
 
 		lpDev->SetStreamSource( 0, pVertex, 0, sizeof( D3DVERTEX ) );
-		lpDev->DrawPrimitive( D3DPT_TRIANGLEFAN, 0, vertexCnt-2 );					// •`‰æ
+		lpDev->DrawPrimitive( D3DPT_TRIANGLEFAN, 0, vertexCnt-2 );					// æç”»
 
 		SAFE_FREE(v);
 	}
 
 
 	if (bStroke) {
-		// —ÖŠsü‚Ì•`‰æ‚ªon‚È‚ç
+		// è¼ªéƒ­ç·šã®æç”»ãŒonãªã‚‰
 
-		// —ÖŠsü‚Ì’¸“_‚ğ‹‚ß‚é
+		// è¼ªéƒ­ç·šã®é ‚ç‚¹ã‚’æ±‚ã‚ã‚‹
 		Point *plineV = NULL;
 		plineV = (Point*)malloc(sizeof(Point)*(vertexCnt*2+2));
 		GetPolyLineVertex(plineV, pPt, vertexCnt);
 
-		// —ÖŠsü‚Ì’¸“_‚ğŠi”[
+		// è¼ªéƒ­ç·šã®é ‚ç‚¹ã‚’æ ¼ç´
 		D3DVERTEX *v = NULL;
 		v = (D3DVERTEX*)malloc(sizeof(D3DVERTEX)*(vertexCnt*2+2));
 		for(int i=0; i<vertexCnt*2+2; i++)
@@ -387,12 +387,12 @@ BOOL DirectXFigure::quad( size_t _vertexCnt, ... ) {
 		SAFE_FREE(plineV);
 
 		void *pData;
-		if (FAILED( pVertex->Lock( 0, sizeof( D3DVERTEX )*(vertexCnt*2+2), (void**)&pData, 0 ) )) {	// ’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN
+		if (FAILED( pVertex->Lock( 0, sizeof( D3DVERTEX )*(vertexCnt*2+2), (void**)&pData, 0 ) )) {	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ãƒ­ãƒƒã‚¯
 			SAFE_FREE(v);
 			return FALSE;
 		}
-		memcpy( pData, v, sizeof( D3DVERTEX )*(vertexCnt*2+2) );								// ’¸“_ƒoƒbƒtƒ@‚É’¸“_À•W‚ğ‘‚«‚İ
-		pVertex->Unlock();																		// ’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN
+		memcpy( pData, v, sizeof( D3DVERTEX )*(vertexCnt*2+2) );								// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã«é ‚ç‚¹åº§æ¨™ã‚’æ›¸ãè¾¼ã¿
+		pVertex->Unlock();																		// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ã‚¢ãƒ³ãƒ­ãƒƒã‚¯
 
 		lpDev->SetStreamSource( 0, pVertex, 0, sizeof( D3DVERTEX ) );
 		lpDev->DrawPrimitive( D3DPT_TRIANGLESTRIP, 0, vertexCnt*2);
@@ -413,7 +413,7 @@ BOOL DirectXFigure::GetPolyLineVertex( Point *pPolyLineVerList, Point *pPolyVerL
 
 	int i;
 
-	// ‘½ŠpŒ`‚Ì•Ó‚ğƒxƒNƒgƒ‹Œ`®‚É‚·‚é
+	// å¤šè§’å½¢ã®è¾ºã‚’ãƒ™ã‚¯ãƒˆãƒ«å½¢å¼ã«ã™ã‚‹
 	LPD3DXVECTOR2 polyLineVec = NULL;
 	polyLineVec = (LPD3DXVECTOR2)malloc(sizeof(D3DXVECTOR2)*polyVerCnt);
 	for (i=1; i<polyVerCnt+1; i++) {
@@ -421,27 +421,27 @@ BOOL DirectXFigure::GetPolyLineVertex( Point *pPolyLineVerList, Point *pPolyVerL
 		polyLineVec[i-1].y = float(pPolyVerList[i%polyVerCnt].y - pPolyVerList[i-1].y);
 	}
 
-	// ‘½ŠpŒ`‚Ì•Ó‚Ì’·‚³‚ğ‹‚ß‚é
+	// å¤šè§’å½¢ã®è¾ºã®é•·ã•ã‚’æ±‚ã‚ã‚‹
 	double *polyLineLen = NULL;
 	polyLineLen = (double *)malloc(sizeof(double)*polyVerCnt);
 	for (i=0; i<polyVerCnt; i++)
 		polyLineLen[i] = GetVec2Length(&polyLineVec[i]);
 
-	// —ÖŠsü‚Ì’¸“_‚ÌÀ•W‚ğ‹‚ß‚é
-	double verDirection;		// —ÖŠsü‚Ì’¸“_‚ÌŒü‚«
-	D3DXVECTOR2 bisector;		// Šp‚Ì2“™•ªü‚ÌƒxƒNƒgƒ‹
-	double dist;				// ‘½ŠpŒ`‚Ì’¸“_‚Æ—ÖŠsü‚Ì’¸“_ŠÔ‚Ì‹——£
+	// è¼ªéƒ­ç·šã®é ‚ç‚¹ã®åº§æ¨™ã‚’æ±‚ã‚ã‚‹
+	double verDirection;		// è¼ªéƒ­ç·šã®é ‚ç‚¹ã®å‘ã
+	D3DXVECTOR2 bisector;		// è§’ã®2ç­‰åˆ†ç·šã®ãƒ™ã‚¯ãƒˆãƒ«
+	double dist;				// å¤šè§’å½¢ã®é ‚ç‚¹ã¨è¼ªéƒ­ç·šã®é ‚ç‚¹é–“ã®è·é›¢
 	Point pt;
 	for (i=1; i<polyVerCnt+1; i++) {
-		polyLineVec[i-1]*=-1.0f;	// ƒxƒNƒgƒ‹‚ğ”½‘ÎŒü‚«‚É
+		polyLineVec[i-1]*=-1.0f;	// ãƒ™ã‚¯ãƒˆãƒ«ã‚’åå¯¾å‘ãã«
 		verDirection = D3DXVec2Dot(&polyLineVec[i-1], &polyLineVec[i%polyVerCnt])/(polyLineLen[i-1]*polyLineLen[i%polyVerCnt]);
 		verDirection = sqrt((verDirection+1.0)/2.0);
 		polyLineVec[i-1]*=-1.0f;
 		bisector = polyLineVec[i-1]/GetVec2Length(&polyLineVec[i-1]) - polyLineVec[i%polyVerCnt]/GetVec2Length(&polyLineVec[i%polyVerCnt]);
-		bisector/= GetVec2Length(&bisector);	// ’PˆÊƒxƒNƒgƒ‹‰»
+		bisector/= GetVec2Length(&bisector);	// å˜ä½ãƒ™ã‚¯ãƒˆãƒ«åŒ–
 		dist = (fStrokeWeight/2)/sqrt(1.0-pow(verDirection, 2.0));
 
-		// Šp‚Ì2“™•ªü‚ÌƒxƒNƒgƒ‹‚Ì‚Ç‚¿‚ç‘¤‚ª‘½ŠpŒ`‚Ì“à‘¤‚È‚Ì‚©‚ğ”»’è‚·‚é
+		// è§’ã®2ç­‰åˆ†ç·šã®ãƒ™ã‚¯ãƒˆãƒ«ã®ã©ã¡ã‚‰å´ãŒå¤šè§’å½¢ã®å†…å´ãªã®ã‹ã‚’åˆ¤å®šã™ã‚‹
 		pt ={(double)(pPolyVerList[i%polyVerCnt].x +bisector.x*0.01), (double)(pPolyVerList[i%polyVerCnt].y +bisector.y*0.01)};
 		if (CheckInsidePolyArea(pPolyVerList, polyVerCnt, &pt))
 			dist*=-1;
@@ -496,7 +496,7 @@ BOOL DirectXFigure::LineSegCross( Point * a1, Point * a2, Point * b1, Point * b2
 	double tc = (a1->x - a2->x) * (b1->y - a1->y) + (a1->y - a2->y) * (a1->x - b1->x);
 	double td = (a1->x - a2->x) * (b2->y - a1->y) + (a1->y - a2->y) * (a1->x - b2->x);
 
-	return tc * td < 0 && ta * tb < 0;	// Œğ·‚µ‚Ä‚¢‚éê‡,true
+	return tc * td < 0 && ta * tb < 0;	// äº¤å·®ã—ã¦ã„ã‚‹å ´åˆ,true
 }
 
 BOOL DirectXFigure::CheckInsidePolyArea( Point * pPolyVerList, size_t polyVerCnt, Point * judgePt ) {
@@ -507,7 +507,7 @@ BOOL DirectXFigure::CheckInsidePolyArea( Point * pPolyVerList, size_t polyVerCnt
 		if (maxY < pPolyVerList[i].y) maxY = pPolyVerList[i].y;
 	}
 	
-	Point pt = {judgePt->x, maxY+1.0};	// ”»’è“_‚©‚çA‚’¼‰ºŒü‚«•ûŒü‚É’Tõ‚·‚é
+	Point pt = {judgePt->x, maxY+1.0};	// åˆ¤å®šç‚¹ã‹ã‚‰ã€å‚ç›´ä¸‹å‘ãæ–¹å‘ã«æ¢ç´¢ã™ã‚‹
 
 	int cnt = 0;
 	for (i=1; i<polyVerCnt+1; i++) {
@@ -515,8 +515,8 @@ BOOL DirectXFigure::CheckInsidePolyArea( Point * pPolyVerList, size_t polyVerCnt
 			cnt++;
 	}
 
-	if (cnt%2 == 1)	return TRUE;	// “_‚ª‘½ŠpŒ`‚Ì“à‘¤‚Ìê‡
-	else			return FALSE;	// “_‚ª‘½ŠpŒ`‚ÌŠO‘¤‚Ìê‡
+	if (cnt%2 == 1)	return TRUE;	// ç‚¹ãŒå¤šè§’å½¢ã®å†…å´ã®å ´åˆ
+	else			return FALSE;	// ç‚¹ãŒå¤šè§’å½¢ã®å¤–å´ã®å ´åˆ
 }
 
 Point DirectXFigure::GetTriangleCenter( Point pt1, Point pt2, Point pt3 ) {

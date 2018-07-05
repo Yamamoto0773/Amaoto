@@ -1,4 +1,4 @@
-#ifndef _DIRECTXFONT_H
+ï»¿#ifndef _DIRECTXFONT_H
 #define _DIRECTXFONT_H
 
 #pragma comment(lib, "dxguid.lib")
@@ -21,8 +21,8 @@ class DirectXText {
 private:
 	LPDIRECT3DDEVICE9		lpDev;
 	IDirect3DVertexBuffer9	*lpVertexBuffer;
-	ID3DXEffect				*lpEffect;			// ƒVƒF[ƒ_ŠÇ——p
-	IDirect3DVertexDeclaration9	*lpDecl;		// ’¸“_éŒ¾ì¬
+	ID3DXEffect				*lpEffect;			// ã‚·ã‚§ãƒ¼ãƒ€ç®¡ç†ç”¨
+	IDirect3DVertexDeclaration9	*lpDecl;		// é ‚ç‚¹å®£è¨€ä½œæˆ
 
 	int						iDrawWidth;
 	int						iDrawHeight;
@@ -32,36 +32,36 @@ private:
 
 	WCHAR					*pSetString[DFONT_MAXSTRING];
 
-	IDirect3DTexture9		*lpFontTex[DFONT_MAXSTRING][DFONT_MAXCHARACTER];		// •¶š‚ÌƒeƒNƒXƒ`ƒƒ
+	IDirect3DTexture9		*lpFontTex[DFONT_MAXSTRING][DFONT_MAXCHARACTER];		// æ–‡å­—ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£
 
 
 public:
 	DirectXText();
 	virtual ~DirectXText();
 
-	//@DirectXText‰Šú‰»
+	//ã€€DirectXTextåˆæœŸåŒ–
 	BOOL Init(LPDIRECT3DDEVICE9 dev, int drawWidth, int drawHeight);
-	// •`‰æ‚·‚é•¶š‚Ì“o˜^
+	// æç”»ã™ã‚‹æ–‡å­—ã®ç™»éŒ²
 	BOOL SetString(int strID, FONTSTATUS *status, const char * s, ...);
-	// •¶š•`‰æ
+	// æ–‡å­—æç”»
 	BOOL Draw(int strID, int x, int y, int fontSize, int charInterval, DWORD color);
-	// w’è—Ìˆæ“à‚Ö•¶š•`‰æ
+	// æŒ‡å®šé ˜åŸŸå†…ã¸æ–‡å­—æç”»
 	BOOL DrawInRect(int strID, RECT *rect, int fontSize, int charInterval, DWORD format, DWORD color);
-	// ƒtƒHƒ“ƒgƒeƒNƒXƒ`ƒƒ‚ğŠJ•ú‚·‚é (ƒfƒXƒgƒ‰ƒNƒ^‚Å©“®“I‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B–¾¦“I‚ÉŒÄ‚Ño‚·•K—v‚Í‚ ‚è‚Ü‚¹‚ñB
+	// ãƒ•ã‚©ãƒ³ãƒˆãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’é–‹æ”¾ã™ã‚‹ (ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§è‡ªå‹•çš„ã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚æ˜ç¤ºçš„ã«å‘¼ã³å‡ºã™å¿…è¦ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚
 	BOOL Clear(int strID);
 
 	
-	// FONTSTATUS\‘¢‘Ì‚É’l‚ğŠi”[‚·‚é@(ŠÖ”‚ğg‚í‚¸‚É’¼Ú\‘¢‘Ì‚É’l‚ğŠi”[‚µ‚Ä‚à\‚¢‚Ü‚¹‚ñ)
+	// FONTSTATUSæ§‹é€ ä½“ã«å€¤ã‚’æ ¼ç´ã™ã‚‹ã€€(é–¢æ•°ã‚’ä½¿ã‚ãšã«ç›´æ¥æ§‹é€ ä½“ã«å€¤ã‚’æ ¼ç´ã—ã¦ã‚‚æ§‹ã„ã¾ã›ã‚“)
 	BOOL SetFontStatus(FONTSTATUS *status, int fontSize, WCHAR *fontName, int fontWeight, bool italic);
 	BOOL SetFontStatusEX(FONTSTATUS *status, int fontSize, WCHAR *fontName, int fontWeight, bool italic, bool underLine, bool struckOut, const int antiAliasing = GGO_GRAY4_BITMAP);
 
-	// RGBA‚ğDWORDŒ^‚É•ÏŠ·‚·‚éŠÖ”BF‚ğ4¬•ª‚Åw’è‚µ‚½‚¢‚Æ‚«‚Ég‚¢‚Ü‚·
+	// RGBAã‚’DWORDå‹ã«å¤‰æ›ã™ã‚‹é–¢æ•°ã€‚è‰²ã‚’4æˆåˆ†ã§æŒ‡å®šã—ãŸã„ã¨ãã«ä½¿ã„ã¾ã™
 	DWORD ConvertFromRGBA(int red, int green, int blue, int alpha = 255);
 
 private:
-	// —^‚¦‚ç‚ê‚½•`‰æ—Ìˆæ‚ÆƒtƒH[ƒ}ƒbƒg‚©‚çAÅI“I‚È•`‰æÀ•W‚ğŒvZ
+	// ä¸ãˆã‚‰ã‚ŒãŸæç”»é ˜åŸŸã¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‹ã‚‰ã€æœ€çµ‚çš„ãªæç”»åº§æ¨™ã‚’è¨ˆç®—
 	int	CalcTextPosition(int strID, RECT *rect, float inScale, int charInterval, DWORD format, const WCHAR *s, POINT *pt, float *outScale);
-	// •¶š—ñ‚ğÅ“K‰»‚·‚é (–ß‚è’l‚ÍÅ“K‰»Œã‚Ì•¶š”)
+	// æ–‡å­—åˆ—ã‚’æœ€é©åŒ–ã™ã‚‹ (æˆ»ã‚Šå€¤ã¯æœ€é©åŒ–å¾Œã®æ–‡å­—æ•°)
 	int OptimizeString(WCHAR *dst, const WCHAR *src);
 
 

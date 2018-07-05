@@ -1,4 +1,4 @@
-#include "MusicGame.h"
+ï»¿#include "MusicGame.h"
 
 #define SAFE_FRRE(x) { if(x){free(x); x=NULL;} }
 
@@ -302,8 +302,8 @@ BOOL MyMusicGame::GetPlayStatus(double *score, double *groove) {
 	double scTmp = 0.0;
 
 	for (i=iPrevCnt; i<iNoteJudge; i++) {
-		grTmp = 1.3/iAllNoteJudgeCnt * 100.0;		// ‘ƒm[ƒg”‚É‰ž‚¶‚Ä•Ï‰»—Ê‚Ì‘å‚«‚³‚ð’²ß
-		scTmp = 1000000.0/iAllNoteJudgeCnt;		// ‘ƒm[ƒg”‚É‰ž‚¶‚Ä•Ï‰»—Ê‚Ì‘å‚«‚³‚ð’²ß			
+		grTmp = 1.3/iAllNoteJudgeCnt * 100.0;		// ç·ãƒŽãƒ¼ãƒˆæ•°ã«å¿œã˜ã¦å¤‰åŒ–é‡ã®å¤§ãã•ã‚’èª¿ç¯€
+		scTmp = 1000000.0/iAllNoteJudgeCnt;		// ç·ãƒŽãƒ¼ãƒˆæ•°ã«å¿œã˜ã¦å¤‰åŒ–é‡ã®å¤§ãã•ã‚’èª¿ç¯€			
 
 		switch (pNoteJudge[i].eJudge) {
 		case JUST:		// just
@@ -373,7 +373,7 @@ BOOL MyMusicGame::GetPlayStatus(double *score, double *groove) {
 	}
 	iPrevCnt = iNoteJudge;
 
-	// ƒOƒ‹[ƒ”—¦‚Ì‘Œ¸ˆ—
+	// ã‚°ãƒ«ãƒ¼ãƒ´çŽ‡ã®å¢—æ¸›å‡¦ç†
 	if (bRateChangeSmoose) {
 		if (fabs(dVariGrooveRate) < 0.05) {
 			dGrooveRate += dVariGrooveRate;

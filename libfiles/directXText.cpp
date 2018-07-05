@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+ï»¿#define _CRT_SECURE_NO_WARNINGS
 
 #include "DirectXText.h"
 
@@ -7,13 +7,13 @@
 
 
 
-// ƒƒ‚ƒŠ‚ÌÄŠJ•ú‚ğ–h‚®
+// ãƒ¡ãƒ¢ãƒªã®å†é–‹æ”¾ã‚’é˜²ã
 #define SAFE_FREE(x) { if (x) { free(x); x=NULL;} }
 #define SAFE_RELEASE(x) {if (x) {x->Release(); x=NULL;} }
 
 
 DirectXText::DirectXText() {
-	// ƒƒP[ƒ‹‚ğ“ú–{‚Éİ’è
+	// ãƒ­ã‚±ãƒ¼ãƒ«ã‚’æ—¥æœ¬ã«è¨­å®š
 	setlocale(LC_CTYPE, "jpn");
 
 	lpDev			= NULL;
@@ -58,14 +58,14 @@ BOOL DirectXText::Init(LPDIRECT3DDEVICE9 dev, int drawWidth, int drawHeight) {
 	lpDev = dev;
 
 
-	// ƒ|ƒŠƒSƒ“¶¬
+	// ãƒãƒªã‚´ãƒ³ç”Ÿæˆ
 	HRESULT hr;
 	hr = lpDev->CreateVertexBuffer(sizeof(Vtx)*4, 0, 0, D3DPOOL_MANAGED, &lpVertexBuffer, 0);
 	if (FAILED(hr))
 		return FALSE;
 
 
-	// ’PˆÊƒtƒHƒ“ƒgƒ|ƒŠƒSƒ“ì¬
+	// å˜ä½ãƒ•ã‚©ãƒ³ãƒˆãƒãƒªã‚´ãƒ³ä½œæˆ
 	Vtx vtx[4] ={
 		{ 0.0f, -1.0f, 1.0f,  0.0f, 1.0f },
 		{ 0.0f,  0.0f, 1.0f,  0.0f, 0.0f },
@@ -79,7 +79,7 @@ BOOL DirectXText::Init(LPDIRECT3DDEVICE9 dev, int drawWidth, int drawHeight) {
 	lpVertexBuffer->Unlock();
 
 
-	// ƒVƒF[ƒ_ì¬
+	// ã‚·ã‚§ãƒ¼ãƒ€ä½œæˆ
 	ID3DXBuffer	*error=NULL;
 	hr = D3DXCreateEffectFromFile(lpDev, L"libfiles/sprite.fx", 0, 0, 0, 0, &lpEffect, &error);
 	if (FAILED(hr)) {
@@ -88,10 +88,10 @@ BOOL DirectXText::Init(LPDIRECT3DDEVICE9 dev, int drawWidth, int drawHeight) {
 	}
 
 
-	// ’¸“_éŒ¾ì¬
+	// é ‚ç‚¹å®£è¨€ä½œæˆ
 	D3DVERTEXELEMENT9 elems[] ={
-		{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},				// ’¸“_ˆÊ’u (x, y, z)
-		{0, sizeof(float)*3, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},	// ƒeƒNƒXƒ`ƒƒÀ•W
+		{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},				// é ‚ç‚¹ä½ç½® (x, y, z)
+		{0, sizeof(float)*3, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},	// ãƒ†ã‚¯ã‚¹ãƒãƒ£åº§æ¨™
 		D3DDECL_END()
 	};
 	dev->CreateVertexDeclaration(elems, &lpDecl);
@@ -111,22 +111,22 @@ BOOL DirectXText::SetString(int strID, FONTSTATUS * status, const char * s, ...)
 
 	Clear(strID);
 
-	///// ‘®•¶š—ñ‚ğWCHARŒ^‚Ì•¶š—ñ‚É•ÏŠ· /////
+	///// æ›¸å¼æ–‡å­—åˆ—ã‚’WCHARå‹ã®æ–‡å­—åˆ—ã«å¤‰æ› /////
 	va_list ap;
 	va_start(ap, s);
 
 
-	// ‘®•ÏŠ·•¶š—ñ‚É]‚Á‚Ä’Êí‚Ì•¶š—ñ‚É‘‚«‚İ
+	// æ›¸å¼å¤‰æ›æ–‡å­—åˆ—ã«å¾“ã£ã¦é€šå¸¸ã®æ–‡å­—åˆ—ã«æ›¸ãè¾¼ã¿
 	char tmp[DFONT_MAXCHARACTER*2+1];
 	vsnprintf(tmp, DFONT_MAXCHARACTER*2+1, s, ap);
 
 	va_end(ap);
 
-	// wcharŒ^‚É•ÏŠ·
+	// wcharå‹ã«å¤‰æ›
 	WCHAR tmp2[DFONT_MAXCHARACTER+1];
 	mbstowcs(tmp2, tmp, DFONT_MAXCHARACTER+1);
 
-	// •¶š—ñ‚ÌÅ“K‰»
+	// æ–‡å­—åˆ—ã®æœ€é©åŒ–
 	WCHAR tmp3[DFONT_MAXCHARACTER+1];
 	int strLen = OptimizeString(tmp3, tmp2);
 
@@ -148,7 +148,7 @@ BOOL DirectXText::SetString(int strID, FONTSTATUS * status, const char * s, ...)
 
 
 
-	// ŠK’²‚ÌÅ‘å’l‚ğ‹‚ß‚é
+	// éšèª¿ã®æœ€å¤§å€¤ã‚’æ±‚ã‚ã‚‹
 	int grad = 0;
 	switch (status->iAntiAliasing) {
 		case GGO_GRAY2_BITMAP: grad = 4; break;
@@ -158,22 +158,22 @@ BOOL DirectXText::SetString(int strID, FONTSTATUS * status, const char * s, ...)
 	}
 
 
-	// ƒtƒHƒ“ƒg‚Ì¶¬
+	// ãƒ•ã‚©ãƒ³ãƒˆã®ç”Ÿæˆ
 	LOGFONT	lf;
-	lf.lfHeight				= status->iFontSize;			// •¶š‚Ì‚‚³
-	lf.lfWidth				= 0;							// •¶š•
-	lf.lfEscapement			= 0;							// •¶š•ûŒü‚ÆX²‚Æ‚ÌŠp“x
-	lf.lfOrientation		= 0;							// Še•¶š‚ÆX²‚Æ‚ÌŠp“x
-	lf.lfWeight				= status->iFontWeight;			// ‘¾‚³
-	lf.lfItalic				= status->bItalic;				// ƒCƒ^ƒŠƒbƒN‘Ì
-	lf.lfUnderline			= status->bUnderline;			// ‰ºü
-	lf.lfStrikeOut			= status->bStruckOut;			// ‘Å‚¿Á‚µü
-	lf.lfCharSet			= DEFAULT_CHARSET;				// ƒLƒƒƒ‰ƒNƒ^ƒZƒbƒg
-	lf.lfOutPrecision		= OUT_DEFAULT_PRECIS;			// o—Í¸“x
-	lf.lfClipPrecision		= CLIP_DEFAULT_PRECIS;			// ƒNƒŠƒbƒsƒ“ƒO‚Ì¸“x
-	lf.lfQuality			= PROOF_QUALITY;				// o—Í•i¿
-	lf.lfPitchAndFamily		= DEFAULT_PITCH | FF_MODERN;	// ƒsƒbƒ`‚Æƒtƒ@ƒ~ƒŠ
-	StringCchCopy(lf.lfFaceName, 32, status->wcFontName);	// ƒtƒHƒ“ƒg–¼
+	lf.lfHeight				= status->iFontSize;			// æ–‡å­—ã®é«˜ã•
+	lf.lfWidth				= 0;							// æ–‡å­—å¹…
+	lf.lfEscapement			= 0;							// æ–‡å­—æ–¹å‘ã¨Xè»¸ã¨ã®è§’åº¦
+	lf.lfOrientation		= 0;							// å„æ–‡å­—ã¨Xè»¸ã¨ã®è§’åº¦
+	lf.lfWeight				= status->iFontWeight;			// å¤ªã•
+	lf.lfItalic				= status->bItalic;				// ã‚¤ã‚¿ãƒªãƒƒã‚¯ä½“
+	lf.lfUnderline			= status->bUnderline;			// ä¸‹ç·š
+	lf.lfStrikeOut			= status->bStruckOut;			// æ‰“ã¡æ¶ˆã—ç·š
+	lf.lfCharSet			= DEFAULT_CHARSET;				// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ã‚»ãƒƒãƒˆ
+	lf.lfOutPrecision		= OUT_DEFAULT_PRECIS;			// å‡ºåŠ›ç²¾åº¦
+	lf.lfClipPrecision		= CLIP_DEFAULT_PRECIS;			// ã‚¯ãƒªãƒƒãƒ”ãƒ³ã‚°ã®ç²¾åº¦
+	lf.lfQuality			= PROOF_QUALITY;				// å‡ºåŠ›å“è³ª
+	lf.lfPitchAndFamily		= DEFAULT_PITCH | FF_MODERN;	// ãƒ”ãƒƒãƒã¨ãƒ•ã‚¡ãƒŸãƒª
+	StringCchCopy(lf.lfFaceName, 32, status->wcFontName);	// ãƒ•ã‚©ãƒ³ãƒˆå
 
 	HFONT hFont = CreateFontIndirect(&lf);
 	if (hFont == NULL) {
@@ -183,13 +183,13 @@ BOOL DirectXText::SetString(int strID, FONTSTATUS * status, const char * s, ...)
 	}
 	iFontSize[strID] = status->iFontSize;
 
-	// ƒfƒoƒCƒX‚É‘I‘ğ‚µ‚½ƒtƒHƒ“ƒg‚ğİ’è
+	// ãƒ‡ãƒã‚¤ã‚¹ã«é¸æŠã—ãŸãƒ•ã‚©ãƒ³ãƒˆã‚’è¨­å®š
 	HDC hdc = GetDC(NULL);
 	HFONT oldFont = (HFONT)SelectObject(hdc, hFont);
 
 
 
-	//// •¶šƒeƒNƒXƒ`ƒƒì¬ ////
+	//// æ–‡å­—ãƒ†ã‚¯ã‚¹ãƒãƒ£ä½œæˆ ////
 	TEXTMETRIC tm;
 	GetTextMetrics(hdc, &tm);
 	CONST MAT2 mat ={ { 0,1 },{ 0,0 },{ 0,0 },{ 0,1 } };
@@ -198,15 +198,15 @@ BOOL DirectXText::SetString(int strID, FONTSTATUS * status, const char * s, ...)
 		GLYPHMETRICS	gm;
 		DWORD size = 0;
 
-		// •¶šƒR[ƒhæ“¾
+		// æ–‡å­—ã‚³ãƒ¼ãƒ‰å–å¾—
 		UINT code = (UINT)pSetString[strID][i];
 
 
-		///// —áŠO•¶š‚Ìˆ— ////
+		///// ä¾‹å¤–æ–‡å­—ã®å‡¦ç† ////
 		bool space = false;
 		switch (code) {
 			case (UINT)L' ':
-			case (UINT)L'@':
+			case (UINT)L'ã€€':
 				space = true;
 				break;
 			case (UINT)L'\n':
@@ -214,9 +214,9 @@ BOOL DirectXText::SetString(int strID, FONTSTATUS * status, const char * s, ...)
 		}
 
 
-		// •¶š‚ÌƒOƒŠƒtƒrƒbƒgƒ}ƒbƒv‚ğæ“¾
+		// æ–‡å­—ã®ã‚°ãƒªãƒ•ãƒ“ãƒƒãƒˆãƒãƒƒãƒ—ã‚’å–å¾—
 		if ((size = GetGlyphOutline(hdc, code, status->iAntiAliasing, &gm, 0, NULL, &mat)) == GDI_ERROR) {
-			SelectObject(hdc, oldFont);			// Œ³‚ÌƒtƒHƒ“ƒg‚É–ß‚·
+			SelectObject(hdc, oldFont);			// å…ƒã®ãƒ•ã‚©ãƒ³ãƒˆã«æˆ»ã™
 			ReleaseDC(NULL, hdc);
 			DeleteObject(hFont);
 			Clear(strID);
@@ -225,25 +225,25 @@ BOOL DirectXText::SetString(int strID, FONTSTATUS * status, const char * s, ...)
 		BYTE *pMono = new BYTE[size];
 		GetGlyphOutline(hdc, code, status->iAntiAliasing, &gm, size, pMono, &mat);
 
-		// •¶šî•ñ‚ğ•Û‘¶
+		// æ–‡å­—æƒ…å ±ã‚’ä¿å­˜
 		pCharData[strID][i].iWidth			= (gm.gmBlackBoxX + 3) / 4 * 4;
 		pCharData[strID][i].iHeight			= gm.gmBlackBoxY;
 		pCharData[strID][i].iAreaWidth		= gm.gmCellIncX;
 		pCharData[strID][i].iAreaHeight		= tm.tmHeight;
 		pCharData[strID][i].iOriginX		= gm.gmptGlyphOrigin.x;
-		pCharData[strID][i].iOriginY		= gm.gmptGlyphOrigin.y-tm.tmAscent;		// ¶ãŒ´“_
+		pCharData[strID][i].iOriginY		= gm.gmptGlyphOrigin.y-tm.tmAscent;		// å·¦ä¸ŠåŸç‚¹
 		
 
 
-		// ƒeƒNƒXƒ`ƒƒì¬
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ä½œæˆ
 		lpDev->CreateTexture(pCharData[strID][i].iWidth, pCharData[strID][i].iHeight, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &lpFontTex[strID][i], NULL);
 
 		if (!space) {
-			// ƒXƒy[ƒX‚Å‚È‚¢ê‡
-			// ƒeƒNƒXƒ`ƒƒ‚ÉƒtƒHƒ“ƒgƒrƒbƒgƒ}ƒbƒvî•ñ‚ğ‘‚«‚İ
+			// ã‚¹ãƒšãƒ¼ã‚¹ã§ãªã„å ´åˆ
+			// ãƒ†ã‚¯ã‚¹ãƒãƒ£ã«ãƒ•ã‚©ãƒ³ãƒˆãƒ“ãƒƒãƒˆãƒãƒƒãƒ—æƒ…å ±ã‚’æ›¸ãè¾¼ã¿
 			D3DLOCKED_RECT lockedRect;
-			lpFontTex[strID][i]->LockRect(0, &lockedRect, NULL, 0);  // ƒƒbƒN
-			DWORD *texBuf = (DWORD*)lockedRect.pBits;   // ƒeƒNƒXƒ`ƒƒƒƒ‚ƒŠ‚Ö‚Ìƒ|ƒCƒ“ƒ^
+			lpFontTex[strID][i]->LockRect(0, &lockedRect, NULL, 0);  // ãƒ­ãƒƒã‚¯
+			DWORD *texBuf = (DWORD*)lockedRect.pBits;   // ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒ¡ãƒ¢ãƒªã¸ã®ãƒã‚¤ãƒ³ã‚¿
 
 			for (int y = 0; y < pCharData[strID][i].iHeight; y++) {
 				for (int x = 0; x < pCharData[strID][i].iWidth; x++) {
@@ -252,16 +252,16 @@ BOOL DirectXText::SetString(int strID, FONTSTATUS * status, const char * s, ...)
 				}
 			}
 
-			lpFontTex[strID][i]->UnlockRect(0);  // ƒAƒ“ƒƒbƒN
+			lpFontTex[strID][i]->UnlockRect(0);  // ã‚¢ãƒ³ãƒ­ãƒƒã‚¯
 		}
 
 		delete[] pMono;
 	}
 
-	// ƒfƒoƒCƒXƒRƒ“ƒeƒLƒXƒg‚ÆƒtƒHƒ“ƒg‚Í‚à‚¤‚¢‚ç‚È‚¢‚Ì‚Å‰ğ•ú
-	SelectObject(hdc, oldFont);			// Œ³‚ÌƒtƒHƒ“ƒg‚É–ß‚·
+	// ãƒ‡ãƒã‚¤ã‚¹ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã¨ãƒ•ã‚©ãƒ³ãƒˆã¯ã‚‚ã†ã„ã‚‰ãªã„ã®ã§è§£æ”¾
+	SelectObject(hdc, oldFont);			// å…ƒã®ãƒ•ã‚©ãƒ³ãƒˆã«æˆ»ã™
 	ReleaseDC(NULL, hdc);
-	DeleteObject(hFont);				// ¡‰ñ‚ÌƒtƒHƒ“ƒg‚ğÁ‹
+	DeleteObject(hFont);				// ä»Šå›ã®ãƒ•ã‚©ãƒ³ãƒˆã‚’æ¶ˆå»
 
 
 	return TRUE;
@@ -297,7 +297,7 @@ BOOL DirectXText::DrawInRect(int strID, RECT * rect, int fontSize, int charInter
 		return FALSE;
 	
 
-	// •`‰æˆÊ’u‚ÌZo
+	// æç”»ä½ç½®ã®ç®—å‡º
 	POINT *pt = NULL;
 	pt = (POINT*)malloc(sizeof(POINT)*wcslen(pSetString[strID]));
 	if (!pt)
@@ -311,7 +311,7 @@ BOOL DirectXText::DrawInRect(int strID, RECT * rect, int fontSize, int charInter
 		return FALSE;
 
 
-	// •`‰æ”{—¦İ’è
+	// æç”»å€ç‡è¨­å®š
 	float scaleX, scaleY;
 	if (((format&0xF0)) == TEXTSCALE_AUTOX)
 		scaleX = tmp*scale, scaleY = tmp;
@@ -321,7 +321,7 @@ BOOL DirectXText::DrawInRect(int strID, RECT * rect, int fontSize, int charInter
 		scaleX = tmp, scaleY = tmp;
 
 
-	// w’èF‚ğfloatŒ^”z—ñ‚É•ÏŠ·
+	// æŒ‡å®šè‰²ã‚’floatå‹é…åˆ—ã«å¤‰æ›
 	float colorRGBA[4]={
 		(color>>16 & 0x000000ff) / 255.0f,
 		(color>>8 & 0x000000ff) /255.0f,
@@ -330,89 +330,89 @@ BOOL DirectXText::DrawInRect(int strID, RECT * rect, int fontSize, int charInter
 	};
 
 
-	//-------------------•`‰æİ’è---------------------------------------
-	// ƒ‰ƒCƒg‚ÍƒIƒt‚Å
+	//-------------------æç”»è¨­å®š---------------------------------------
+	// ãƒ©ã‚¤ãƒˆã¯ã‚ªãƒ•ã§
 	lpDev->SetRenderState(D3DRS_LIGHTING, FALSE);
-	// ƒ¿ƒuƒŒƒ“ƒhİ’è
+	// Î±ãƒ–ãƒ¬ãƒ³ãƒ‰è¨­å®š
 	lpDev->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	lpDev->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	lpDev->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	//ƒeƒNƒXƒ`ƒƒ‚ÌƒAƒ‹ƒtƒ@‚ğ“§–¾“x‚ğg—p‚·‚éİ’è
+	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ã‚¢ãƒ«ãƒ•ã‚¡ã‚’é€æ˜åº¦ã‚’ä½¿ç”¨ã™ã‚‹è¨­å®š
 	lpDev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG2);
 	lpDev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TEXTURE);
 	lpDev->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	lpDev->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
 	lpDev->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
-	lpDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);					// ¶èŒn
+	lpDev->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);					// å·¦æ‰‹ç³»
 
-	lpDev->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);			// ƒeƒNƒXƒ`ƒƒ‚ª‚Í‚İo‚½‚É•\¦‚µ‚È‚¢‚É‚·‚é
+	lpDev->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);			// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒã¯ã¿å‡ºãŸæ™‚ã«è¡¨ç¤ºã—ãªã„ã«ã™ã‚‹
 	lpDev->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	lpDev->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	lpDev->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	//-------------------------------------------------------------------
 
 
-	D3DXMATRIX worldOffset;						// ƒ|ƒŠƒSƒ“‚Ì”z’uÀ•W
-	D3DXMATRIX localScale;						// ƒ|ƒŠƒSƒ“‚Ì‘å‚«‚³ (Šg‘å”{—¦
-	D3DXMATRIX localOffset;						// ƒ|ƒŠƒSƒ“‚ÌŒ´“_À•W
+	D3DXMATRIX worldOffset;						// ãƒãƒªã‚´ãƒ³ã®é…ç½®åº§æ¨™
+	D3DXMATRIX localScale;						// ãƒãƒªã‚´ãƒ³ã®å¤§ãã• (æ‹¡å¤§å€ç‡
+	D3DXMATRIX localOffset;						// ãƒãƒªã‚´ãƒ³ã®åŸç‚¹åº§æ¨™
 	D3DXMATRIX localMat;
 	D3DXMATRIX world;
 
-	// ¶èÀ•WŒn³Ë‰es—ñ‚ğİ’è
+	// å·¦æ‰‹åº§æ¨™ç³»æ­£å°„å½±è¡Œåˆ—ã‚’è¨­å®š
 	D3DXMATRIX ortho;
 	D3DXMatrixOrthoLH(&ortho, (float)iDrawWidth, (float)iDrawHeight, 0.0f, 1000.0f);
 	lpDev->SetTransform(D3DTS_PROJECTION, &ortho);
 
 
-	//// •¶š•`‰æ /////
+	//// æ–‡å­—æç”» /////
 
 	lpDev->SetVertexDeclaration(lpDecl);
 	lpDev->SetStreamSource(0, lpVertexBuffer, 0, sizeof(Vtx));
 	lpEffect->SetTechnique("BasicTech");
 
-	// ƒVƒF[ƒ_ŠJn
+	// ã‚·ã‚§ãƒ¼ãƒ€é–‹å§‹
 	UINT numPass = 0;
 	lpEffect->Begin(&numPass, 0);
 
 	for (int i=0; i<charCnt; i++) {
 
-		// •`‰æ‚·‚é•¶š‚Ì•¶šƒR[ƒhæ“¾
+		// æç”»ã™ã‚‹æ–‡å­—ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰å–å¾—
 		UINT code = (UINT)pSetString[strID][i];
 
 
-		// ƒeƒNƒXƒ`ƒƒ‚ª‘¶İ‚·‚é‚©ƒ`ƒFƒbƒN
+		// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãŒå­˜åœ¨ã™ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
 		if (!lpFontTex[strID][i])
 			continue;
 
 
-		// ƒXƒNƒŠ[ƒ“‚Ì¶ã‹÷‚ğŒ´“_‚Æ‚µ‚½À•W‚É•ÏŠ·
+		// ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã®å·¦ä¸Šéš…ã‚’åŸç‚¹ã¨ã—ãŸåº§æ¨™ã«å¤‰æ›
 		pt[i].x -= iDrawWidth / 2;
 		pt[i].y -= iDrawHeight / 2;
 		pt[i].y *= -1;
 
 
-		// ƒ[ƒ‹ƒhƒrƒ…[Ë‰e•ÏŠ·s—ñ‚ğì¬
-		D3DXMatrixScaling(&localScale, (float)pCharData[strID][i].iWidth*scaleX, (float)pCharData[strID][i].iHeight*scaleY, 1.0f);				// ƒ|ƒŠƒSƒ“‚ğ•¶š‚Ì‘å‚«‚³‚É‚·‚é
-		D3DXMatrixTranslation(&localOffset, (float)pCharData[strID][i].iOriginX*scaleX, (float)pCharData[strID][i].iOriginY*scaleY, 0.0f);		// ƒ|ƒŠƒSƒ“‚ğ•¶š‚ÌŒ´“_‚ÉˆÚ“®
+		// ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ“ãƒ¥ãƒ¼å°„å½±å¤‰æ›è¡Œåˆ—ã‚’ä½œæˆ
+		D3DXMatrixScaling(&localScale, (float)pCharData[strID][i].iWidth*scaleX, (float)pCharData[strID][i].iHeight*scaleY, 1.0f);				// ãƒãƒªã‚´ãƒ³ã‚’æ–‡å­—ã®å¤§ãã•ã«ã™ã‚‹
+		D3DXMatrixTranslation(&localOffset, (float)pCharData[strID][i].iOriginX*scaleX, (float)pCharData[strID][i].iOriginY*scaleY, 0.0f);		// ãƒãƒªã‚´ãƒ³ã‚’æ–‡å­—ã®åŸç‚¹ã«ç§»å‹•
 		D3DXMATRIX localMat = localScale*localOffset;
 		D3DXMatrixTranslation(&worldOffset, (float)pt[i].x -0.5f, (float)pt[i].y +0.5f, 0.0f);
 		world = localMat * worldOffset;
 		D3DXMATRIX matWorldViewProj = world*ortho;
 
 
-		// ƒVƒF[ƒ_’è”İ’è
-		lpEffect->SetTexture("tex", lpFontTex[strID][i]);			// ƒeƒNƒXƒ`ƒƒw’è
-		lpEffect->SetMatrix("matWorldViewProj", &matWorldViewProj);	// ƒ[ƒ‹ƒhƒrƒ…[Ë‰e•ÏŠ·s—ñ‚ğİ’è
-		lpEffect->SetFloatArray("color", colorRGBA, 4);				// Fw’è
+		// ã‚·ã‚§ãƒ¼ãƒ€å®šæ•°è¨­å®š
+		lpEffect->SetTexture("tex", lpFontTex[strID][i]);			// ãƒ†ã‚¯ã‚¹ãƒãƒ£æŒ‡å®š
+		lpEffect->SetMatrix("matWorldViewProj", &matWorldViewProj);	// ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ“ãƒ¥ãƒ¼å°„å½±å¤‰æ›è¡Œåˆ—ã‚’è¨­å®š
+		lpEffect->SetFloatArray("color", colorRGBA, 4);				// è‰²æŒ‡å®š
 		
-		// •`‰æŠJn
+		// æç”»é–‹å§‹
 		lpEffect->BeginPass(0);
-		lpDev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);			// •`‰æ
+		lpDev->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);			// æç”»
 		lpEffect->EndPass();
 
 		
 	}
-	// ƒVƒF[ƒ_I—¹
+	// ã‚·ã‚§ãƒ¼ãƒ€çµ‚äº†
 	lpEffect->End();
 
 	free(pt);
@@ -448,7 +448,7 @@ int DirectXText::CalcTextPosition(int strID, RECT * rect, float inScale, int cha
 	if (!outScale)
 		return FALSE;
 
-	// ƒtƒH[ƒ}ƒbƒg‚Ì‘g‚İ‡‚í‚¹‚ğƒ`ƒFƒbƒN
+	// ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã®çµ„ã¿åˆã‚ã›ã‚’ãƒã‚§ãƒƒã‚¯
 	if (((format&0x0F)) == TEXTALIGN_NONE) {
 		if (((format&0xF0)) == TEXTSCALE_AUTOX || ((format&0xF0)) == TEXTSCALE_AUTOXY)
 			return FALSE;
@@ -456,13 +456,13 @@ int DirectXText::CalcTextPosition(int strID, RECT * rect, float inScale, int cha
 
 	int charCnt = 0;
 
-	// —Ìˆæ‚Ìc‰¡‚Ì’·‚³‚ğ‹‚ß‚é
+	// é ˜åŸŸã®ç¸¦æ¨ªã®é•·ã•ã‚’æ±‚ã‚ã‚‹
 	int rectX = rect->right - rect->left;
 	int rectY = rect->bottom - rect->top;
 
 
-	int lineHead = 0;	// ŒvZ‘ÎÛ‚Å‚ ‚és‚ÌAæ“ª•¶š‚Ì”Ô†
-	int lineEnd = 0;	// ŒvZ‘ÎÛ‚Å‚ ‚és‚ÌAÅŒã‚Ì•¶š‚Ì”Ô†
+	int lineHead = 0;	// è¨ˆç®—å¯¾è±¡ã§ã‚ã‚‹è¡Œã®ã€å…ˆé ­æ–‡å­—ã®ç•ªå·
+	int lineEnd = 0;	// è¨ˆç®—å¯¾è±¡ã§ã‚ã‚‹è¡Œã®ã€æœ€å¾Œã®æ–‡å­—ã®ç•ªå·
 	float offsetX = 0;
 	float offsetY = 0;
 	float scaleX = 1.0f;
@@ -473,7 +473,7 @@ int DirectXText::CalcTextPosition(int strID, RECT * rect, float inScale, int cha
 		float lineLen = 0.0f;
 		float lineHeight = pCharData[strID][0].iAreaHeight*inScale;
 
-		// c•ûŒü‚É‚Í‚İo‚µ‚½‚ç
+		// ç¸¦æ–¹å‘ã«ã¯ã¿å‡ºã—ãŸã‚‰
 		if (offsetY + lineHeight > rectY) {
 			if (((format&0x0F)) != TEXTALIGN_NONE && ((format&0xF0)) != TEXTSCALE_AUTOXY) {
 				break;
@@ -481,23 +481,23 @@ int DirectXText::CalcTextPosition(int strID, RECT * rect, float inScale, int cha
 		}
 
 
-		//// s‚Ì’·‚³‚ÌZo ////
+		//// è¡Œã®é•·ã•ã®ç®—å‡º ////
 		bool canPut = false;
 		int i = -1;
 		while ((lineHead+ ++i) < wcslen(s)) {
 
-			// •¶šƒR[ƒhæ“¾
+			// æ–‡å­—ã‚³ãƒ¼ãƒ‰å–å¾—
 			UINT code = (UINT)s[lineHead +i];
 
 			
-			// ‰üs‚È‚çs‚ÌI‚í‚è‚Æ‚·‚é
+			// æ”¹è¡Œãªã‚‰è¡Œã®çµ‚ã‚ã‚Šã¨ã™ã‚‹
 			if (code == (UINT)'\n') {
 				i++;
 				canPut = true;
 				break;
 			}
 
-			// ‰¡•ûŒü‚É‚Í‚İo‚µ‚½‚ç
+			// æ¨ªæ–¹å‘ã«ã¯ã¿å‡ºã—ãŸã‚‰
 			if (lineLen + pCharData[strID][lineHead +i].iAreaWidth*inScale > rectX) {
 				if (((format&0x0F)) != TEXTALIGN_NONE && (format&0xF0) == TEXTSCALE_NONE) {
 					break;
@@ -508,14 +508,14 @@ int DirectXText::CalcTextPosition(int strID, RECT * rect, float inScale, int cha
 			canPut = true;
 		}
 
-		if (!canPut)	// 1•¶š‚à”z’u‚Å‚«‚È‚¢ê‡‚ÍI—¹
+		if (!canPut)	// 1æ–‡å­—ã‚‚é…ç½®ã§ããªã„å ´åˆã¯çµ‚äº†
 			break;
 
 		lineEnd = lineHead + i-1;
-		lineLen -= charInterval;	// s––‚Ì‹ó”’‚ğíœ
+		lineLen -= charInterval;	// è¡Œæœ«ã®ç©ºç™½ã‚’å‰Šé™¤
 
 		
-		// k¬”{—¦ŒvZ
+		// ç¸®å°å€ç‡è¨ˆç®—
 		if ((format&0xF0) != TEXTSCALE_NONE) {
 			if (lineLen > rectX)
 				scaleX = rectX/lineLen;
@@ -523,7 +523,7 @@ int DirectXText::CalcTextPosition(int strID, RECT * rect, float inScale, int cha
 				scaleY = rectY/lineHeight;
 
 			if ((format&0xF0) == TEXTSCALE_AUTOXY)
-				*outScale = (scaleX < scaleY) ? scaleX : scaleY; // ¬‚³‚¢•û‚É‡‚í‚¹‚Äc‰¡”ä‚ğˆÛ
+				*outScale = (scaleX < scaleY) ? scaleX : scaleY; // å°ã•ã„æ–¹ã«åˆã‚ã›ã¦ç¸¦æ¨ªæ¯”ã‚’ç¶­æŒ
 			else
 				*outScale = scaleX;
 
@@ -535,7 +535,7 @@ int DirectXText::CalcTextPosition(int strID, RECT * rect, float inScale, int cha
 		}
 		
 
-		// s“ª‚Ì•`‰æˆÊ’u‚ÌZo
+		// è¡Œé ­ã®æç”»ä½ç½®ã®ç®—å‡º
 		switch ((format&0x0F)) {
 			case TEXTALIGN_CENTERX:
 				offsetX = (rectX - lineLen)/2;
@@ -553,7 +553,7 @@ int DirectXText::CalcTextPosition(int strID, RECT * rect, float inScale, int cha
 		}
 
 
-		// •`‰æˆÊ’u‚Ì•Û‘¶
+		// æç”»ä½ç½®ã®ä¿å­˜
 		for (charCnt=lineHead; charCnt<=lineEnd; charCnt++) {
 			pt[charCnt].x = rect->left + (int)offsetX;
 			pt[charCnt].y = rect->top + (int)offsetY;
@@ -562,16 +562,16 @@ int DirectXText::CalcTextPosition(int strID, RECT * rect, float inScale, int cha
 		}
 
 		
-		// ‰üsˆ—
+		// æ”¹è¡Œå‡¦ç†
 		if ((format&0xF0) == TEXTSCALE_AUTOX ||
 			(format&0xF0) == TEXTSCALE_AUTOXY ||
-			(format&0x0F) == TEXTALIGN_CENTERXY)		// 1s‚Ì‚İ‚ÌƒtƒH[ƒ}ƒbƒg‚Í‚±‚±‚ÅI—¹
+			(format&0x0F) == TEXTALIGN_CENTERXY)		// 1è¡Œã®ã¿ã®ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã¯ã“ã“ã§çµ‚äº†
 			break;
 
 		offsetX = 0;
 		offsetY += lineHeight;
 
-		lineHead = lineEnd+1;	// s“ª•¶š‚ğXV
+		lineHead = lineEnd+1;	// è¡Œé ­æ–‡å­—ã‚’æ›´æ–°
 	}
 
 	return charCnt;
@@ -601,7 +601,7 @@ BOOL DirectXText::OptimizeString(WCHAR *dst, const WCHAR *src) {
 		}
 	}
 
-	dst[cnt] = L'\0';	// NULL•¶š
+	dst[cnt] = L'\0';	// NULLæ–‡å­—
 
 	return cnt;
 }

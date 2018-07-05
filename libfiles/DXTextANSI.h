@@ -1,4 +1,4 @@
-#ifndef _DXTEXTANSI_H
+ï»¿#ifndef _DXTEXTANSI_H
 #define _DXTEXTANSI_H
 
 #pragma comment(lib, "dxguid.lib")
@@ -29,8 +29,8 @@ private:
 	LPDIRECT3DDEVICE9		lpDev;
 
 	IDirect3DVertexBuffer9	*lpVertexBuffer;
-	ID3DXEffect				*lpEffect;			// ƒVƒF[ƒ_ŠÇ——p
-	IDirect3DVertexDeclaration9	*lpDecl;		// ’¸“_éŒ¾ì¬
+	ID3DXEffect				*lpEffect;			// ã‚·ã‚§ãƒ¼ãƒ€ç®¡ç†ç”¨
+	IDirect3DVertexDeclaration9	*lpDecl;		// é ‚ç‚¹å®£è¨€ä½œæˆ
 
 	int						iDrawWidth;
 	int						iDrawHeight;
@@ -45,28 +45,28 @@ public:
 	DXTextANSI();
 	~DXTextANSI();
 
-	// DXTextANSI‰Šú‰»@¦•`‰æ‘O‚É•K‚¸ŒÄ‚Ño‚·
+	// DXTextANSIåˆæœŸåŒ–ã€€â€»æç”»å‰ã«å¿…ãšå‘¼ã³å‡ºã™
 	BOOL	Init(LPDIRECT3DDEVICE9 dev, int drawWidth, int drawHeight);
-	// ƒeƒNƒXƒ`ƒƒ¶¬@ANSI•¶š‚ÌƒeƒNƒXƒ`ƒƒ‚ğì¬@¦•`‰æ‘O‚ÉŒÄ‚Ño‚·
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ç”Ÿæˆã€€ANSIæ–‡å­—ã®ãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’ä½œæˆã€€â€»æç”»å‰ã«å‘¼ã³å‡ºã™
 	BOOL	Create(int fontSize, int fontWeight, WCHAR *fontName, bool italic);
-	// •¶š•`‰æ
+	// æ–‡å­—æç”»
 	BOOL	Draw(int x, int y, int fontSize, int charInterval, DWORD color, const char *s, ...);
-	// —^‚¦‚ç‚ê‚½—Ìˆæ“à‚Ö•¶š•`‰æ
+	// ä¸ãˆã‚‰ã‚ŒãŸé ˜åŸŸå†…ã¸æ–‡å­—æç”»
 	BOOL	DrawInRect(RECT *rect, int fontSize, int charInterval, DWORD format, DWORD color, const char *s, ...);
-	// ƒtƒHƒ“ƒgƒeƒNƒXƒ`ƒƒ‚ğŠJ•ú‚·‚é@(ƒfƒXƒgƒ‰ƒNƒ^‚Å©“®“I‚ÉŒÄ‚Ño‚³‚ê‚Ü‚·B–¾¦“I‚ÉŒÄ‚Ño‚·•K—v‚Í‚ ‚è‚Ü‚¹‚ñ
+	// ãƒ•ã‚©ãƒ³ãƒˆãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’é–‹æ”¾ã™ã‚‹ã€€(ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§è‡ªå‹•çš„ã«å‘¼ã³å‡ºã•ã‚Œã¾ã™ã€‚æ˜ç¤ºçš„ã«å‘¼ã³å‡ºã™å¿…è¦ã¯ã‚ã‚Šã¾ã›ã‚“
 	BOOL	Clear();
 
 
-	//@RGBA‚ğDWORDŒ^‚É•ÏŠ·‚·‚éŠÖ”BF‚ğ4¬•ª‚Åw’è‚µ‚½‚¢‚Æ‚«‚Ég‚¢‚Ü‚·
+	//ã€€RGBAã‚’DWORDå‹ã«å¤‰æ›ã™ã‚‹é–¢æ•°ã€‚è‰²ã‚’4æˆåˆ†ã§æŒ‡å®šã—ãŸã„ã¨ãã«ä½¿ã„ã¾ã™
 	DWORD	ConvertFromRGBA(int red, int green, int blue, int alpha = 255);
 
 private:
 
-	// —^‚¦‚ç‚ê‚½•`‰æ—Ìˆæ‚ÆƒtƒH[ƒ}ƒbƒg‚©‚çAÅI“I‚È•`‰æÀ•W‚ğŒvZ
+	// ä¸ãˆã‚‰ã‚ŒãŸæç”»é ˜åŸŸã¨ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‹ã‚‰ã€æœ€çµ‚çš„ãªæç”»åº§æ¨™ã‚’è¨ˆç®—
 	int	CalcTextPosition(RECT *rect, float inScale, int charInterval, DWORD format, const char *s, POINT *pt, float *outScale);
-	// ÀÛ‚É•`‰æ‚ğ’S“–‚·‚éŠÖ”
+	// å®Ÿéš›ã«æç”»ã‚’æ‹…å½“ã™ã‚‹é–¢æ•°
 	int		DrawTEXT(RECT *rect, int fontSize, int charInterval, DWORD format, DWORD color, const char *s, va_list arg);
-	// •¶š—ñ‚ğÅ“K‰»‚·‚é (–ß‚è’l‚ÍÅ“K‰»Œã‚Ì•¶š”)
+	// æ–‡å­—åˆ—ã‚’æœ€é©åŒ–ã™ã‚‹ (æˆ»ã‚Šå€¤ã¯æœ€é©åŒ–å¾Œã®æ–‡å­—æ•°)
 	int		OptimizeString(char *dst, const char *src);
 
 };

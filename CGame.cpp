@@ -57,7 +57,7 @@ CGame::~CGame() {
 ///////////////////////////////////////////////////////
 // 初期化＆ゲーム形成
 ///////////////////////////////////////////////////////
-BOOL CGame::Init(HINSTANCE hinst) {
+bool CGame::Init(HINSTANCE hinst) {
 	// ウインドウ生成
 	win.SetWindowStyle(WS_OVERLAPPEDWINDOW);					// 枠無しウインドウ(フルスクリーン時はWS_POPUPのみ、ウィンドウモード時はさらにWS_CAPTION|WS_SYSMENUなどを付ける)
 	win.SetIcon(MAKEINTRESOURCEW(IDI_ICON1));		// アイコン設定
@@ -235,6 +235,11 @@ BOOL CGame::Init(HINSTANCE hinst) {
 	QueryPerformanceFrequency(&freq);
 	llGlobalFreq = freq.QuadPart;
 
+
+	bool isvalid = hptimer._IsHighPrecisionValid();
+
+	
+
 	// タイマー初期化
 	tm.Start(60);
 
@@ -247,7 +252,7 @@ BOOL CGame::Init(HINSTANCE hinst) {
 ///////////////////////////////////////////////////////
 // ロード済みデータの全開放
 ///////////////////////////////////////////////////////
-BOOL CGame::Clear(void) {
+bool CGame::Clear(void) {
 	int i;
 
 	ds.Clear();
@@ -264,7 +269,7 @@ BOOL CGame::Clear(void) {
 //////////////////////////////////////////////////////////
 // 音楽ゲームの初期化
 //////////////////////////////////////////////////////////
-BOOL CGame::InitGame() {
+bool CGame::InitGame() {
 	int i, j;
 
 	// ヘッダーデータを全ロード
@@ -339,7 +344,7 @@ BOOL CGame::InitGame() {
 ///////////////////////////////////////////////////////
 // 演奏モード初期化関数
 ///////////////////////////////////////////////////////
-BOOL CGame::InitPlayMusicMode(LONG musicID, DIFFICULTY diff) {
+bool CGame::InitPlayMusicMode(long musicID, DIFFICULTY diff) {
 	char diffStr[13];
 	switch (diff) {
 		case DIFF_ELEMENTARY: strcpy(diffStr, "ELEMENTARY"); break;
@@ -468,7 +473,7 @@ BOOL CGame::InitPlayMusicMode(LONG musicID, DIFFICULTY diff) {
 	return TRUE;
 }
 
-BOOL CGame::InitTitle() {
+bool CGame::InitTitle() {
 
 	// 波紋エフェクトセット
 	iRippleEffectIndex = 0;
@@ -506,24 +511,26 @@ int CGame::RunTitle() {
 	int i, j, k;
 
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+
+	dElapsedTime = hptimer.GetTime();
 
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	// 入力処理関係
 	///////////////////////////////////////////////////////////////////////////////////////
 	// キーボード入力
-	BYTE key[256];
+	unsigned char key[256];
 	di.GetKeyboard(key);
 
 	// midiキーボード入力
 	MIDIKEYSTATE midiKey[MIDIKEYCNT];
-	BOOL getMidiKeyFlag = mi.GetKeyState(midiKey);
+	bool getMidiKeyFlag = mi.GetKeyState(midiKey);
 
 	// 仮想入力キーへ変換
-	BOOL pressVirtualKey[VIRTUALKEYCNT];
+	bool pressVirtualKey[VIRTUALKEYCNT];
 	ZeroMemory(pressVirtualKey, sizeof(pressVirtualKey));
 	if (dElapsedTime > 0.5) {
 		InputVirtualKey(pressVirtualKey, midiKey, key, getMidiKeyFlag);
@@ -687,12 +694,15 @@ int CGame::RunTitle() {
 ///////////////////////////////////////////////////////
 // 曲演奏モード実行関数
 ///////////////////////////////////////////////////////
-int CGame::RunPlayMusicMode(LONG musicID, BOOL demo) {
+int CGame::RunPlayMusicMode(long musicID, bool demo) {
 
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+
+	dElapsedTime = hptimer.GetTime();
+
 
 	// テンポラリ変数
 	int i, j, k;
@@ -703,15 +713,15 @@ int CGame::RunPlayMusicMode(LONG musicID, BOOL demo) {
 	// 入力処理関係
 	///////////////////////////////////////////////////////////////////////////////////////
 	// キーボード入力
-	BYTE key[256];
+	unsigned char key[256];
 	di.GetKeyboard(key);
 
 	// midiキーボード入力
 	MIDIKEYSTATE midiKey[MIDIKEYCNT];
-	BOOL getMidiKeyFlag = mi.GetKeyState(midiKey);
+	bool getMidiKeyFlag = mi.GetKeyState(midiKey);
 
 	// 仮想入力キーへ変換
-	BOOL pressVirtualKey[VIRTUALKEYCNT];
+	bool pressVirtualKey[VIRTUALKEYCNT];
 	ZeroMemory(pressVirtualKey, sizeof(pressVirtualKey));
 	InputVirtualKey(pressVirtualKey, midiKey, key, getMidiKeyFlag);
 
@@ -746,7 +756,7 @@ int CGame::RunPlayMusicMode(LONG musicID, BOOL demo) {
 	}
 
 	// 経過した時間から進んだBMSカウント値を算出
-	LONG now_count = bms[musicID].GetCountFromTime(dElapsedTime);
+	long now_count = bms[musicID].GetCountFromTime(dElapsedTime);
 
 	// BMSカウンタが曲の最大カウント+1小節を超えたら終了
 	if (bms[musicID].GetMaxCount()+BMS_RESOLUTION<=now_count) {
@@ -891,11 +901,11 @@ int CGame::RunPlayMusicMode(LONG musicID, BOOL demo) {
 			}
 		}
 
-		const LONG JUST_RANGE		= (long)(BMS_RESOLUTION / 36*nowBpm/120);		// Justと判定する中心からの範囲
-		const LONG JUSTLE_RANGE		= (long)(BMS_RESOLUTION / 16*nowBpm/120);		// JustLEと判定する中心からの範囲
-		const LONG LATEEARLY_RANGE	= (long)(BMS_RESOLUTION / 8*nowBpm/120);		// Late/Earlyと判定する中心からの範囲
-		const LONG LATE2EARLY2_RANGE= (long)(BMS_RESOLUTION / 4*nowBpm/120);		// Late2/Early2と判定する中心からの範囲
-		const LONG MISS_RANGE		= (long)(BMS_RESOLUTION / 4*nowBpm/120);		// Miss判定する中心からの範囲
+		const long JUST_RANGE		= (long)(BMS_RESOLUTION / 36*nowBpm/120);		// Justと判定する中心からの範囲
+		const long JUSTLE_RANGE		= (long)(BMS_RESOLUTION / 16*nowBpm/120);		// JustLEと判定する中心からの範囲
+		const long LATEEARLY_RANGE	= (long)(BMS_RESOLUTION / 8*nowBpm/120);		// Late/Earlyと判定する中心からの範囲
+		const long LATE2EARLY2_RANGE= (long)(BMS_RESOLUTION / 4*nowBpm/120);		// Late2/Early2と判定する中心からの範囲
+		const long MISS_RANGE		= (long)(BMS_RESOLUTION / 4*nowBpm/120);		// Miss判定する中心からの範囲
 
 		// まずは見逃しmissの処理から
 		for (i=iStartNum[BMS_NOTE]; i < bms[musicID].GetBmsNoteCnt(); i++) {
@@ -934,7 +944,7 @@ int CGame::RunPlayMusicMode(LONG musicID, BOOL demo) {
 				LPBMSNOTE b = bms[musicID].GetBmsNote(lHoldNote[j]);
 				LPNOTEDEFDATA n = bms[musicID].GetNoteDefData(b->lIndex);
 
-				LONG sub = now_count - b->lTime2;		// ノートとの差を計算 (負の値は入力が基準より早かったことを表す
+				long sub = now_count - b->lTime2;		// ノートとの差を計算 (負の値は入力が基準より早かったことを表す
 				JUDGE judge;
 				if (sub < -LATEEARLY_RANGE*3 / 2) {
 					judge = HOLDBREAK;						// 早ミス
@@ -981,7 +991,7 @@ int CGame::RunPlayMusicMode(LONG musicID, BOOL demo) {
 				bool keyFlag = false;
 				int noteNum;
 				float gapMin = 1.00f;
-				LONG time;
+				long time;
 				k = 0;
 
 				for (i = iStartNum[BMS_NOTE]; i < bms[musicID].GetBmsNoteCnt(); i++) {
@@ -1019,8 +1029,8 @@ int CGame::RunPlayMusicMode(LONG musicID, BOOL demo) {
 
 					JUDGE best;
 					JUDGE judge;
-					LONG sub;
-					LONG sub2;
+					long sub;
+					long sub2;
 					int num[20];
 					int cnt = 0;
 					for (i = noteNum; i< bms[musicID].GetBmsNoteCnt(); i++) {
@@ -1219,7 +1229,7 @@ int CGame::RunPlayMusicMode(LONG musicID, BOOL demo) {
 
 	// ノート＆ノートレーン
 	bool flag[BMS_MAXNOTELANE] ={ false };
-	BOOL bJudgeHoldNote = FALSE;			// ホールドノートが現在判定中か調べる
+	bool bJudgeHoldNote = FALSE;			// ホールドノートが現在判定中か調べる
 	for (i=0; i<VIRTUALKEYCNT; i++) {
 		if (lHoldNote[i] >= 0) {
 			bJudgeHoldNote = TRUE;
@@ -1438,7 +1448,7 @@ int CGame::RunPlayMusicMode(LONG musicID, BOOL demo) {
 ///////////////////////////////////////////////////////
 // 曲選択モード初期化関数
 ///////////////////////////////////////////////////////
-BOOL CGame::InitMusicSelectionMode() {
+bool CGame::InitMusicSelectionMode() {
 	iCursor1 = 0;
 
 	iRippleEffectIndex = 0;
@@ -1462,23 +1472,25 @@ int CGame::RunMusicSelectionMode() {
 
 
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+
+	dElapsedTime = hptimer.GetTime();
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	// 入力処理関係
 	///////////////////////////////////////////////////////////////////////////////////////
 	// キーボード入力
-	BYTE key[256];
+	unsigned char key[256];
 	di.GetKeyboard(key);
 
 	// midiキーボード入力
 	MIDIKEYSTATE midiKey[MIDIKEYCNT];
-	BOOL getMidiKeyFlag = mi.GetKeyState(midiKey);
+	bool getMidiKeyFlag = mi.GetKeyState(midiKey);
 
 	// 仮想入力キーへ変換
-	BOOL pressVirtualKey[VIRTUALKEYCNT];
+	bool pressVirtualKey[VIRTUALKEYCNT];
 	ZeroMemory(pressVirtualKey, sizeof(pressVirtualKey));
 	if (dElapsedTime > 0.5) {	// 前画面時の多重入力による誤操作を防ぐ
 		InputVirtualKey(pressVirtualKey, midiKey, key, getMidiKeyFlag);
@@ -1760,7 +1772,7 @@ int CGame::RunMusicSelectionMode() {
 //////////////////////////////////////////////
 // 難易度選択モード初期化
 //////////////////////////////////////////////
-BOOL CGame::InitDifficultySectionMode() {
+bool CGame::InitDifficultySectionMode() {
 
 	ZeroMemory(bOnVirtualKey, sizeof(bOnVirtualKey));
 
@@ -1792,24 +1804,25 @@ int CGame::RunDifficultySelectionMode() {
 	int i, j, k;
 
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
 
+	dElapsedTime = hptimer.GetTime();
 
 	///////////////////////////////////////////////////////////////////////////////////////
 	// 入力処理関係
 	///////////////////////////////////////////////////////////////////////////////////////
 	// キーボード入力
-	BYTE key[256];
+	unsigned char key[256];
 	di.GetKeyboard(key);
 
 	// midiキーボード入力
 	MIDIKEYSTATE midiKey[MIDIKEYCNT];
-	BOOL getMidiKeyFlag = mi.GetKeyState(midiKey);
+	bool getMidiKeyFlag = mi.GetKeyState(midiKey);
 
 	// 仮想入力キーへ変換
-	BOOL pressVirtualKey[VIRTUALKEYCNT];
+	bool pressVirtualKey[VIRTUALKEYCNT];
 	ZeroMemory(pressVirtualKey, sizeof(pressVirtualKey));
 
 	if (dElapsedTime > 0.5) {	// 前画面時の多重入力による誤操作を防ぐ
@@ -2106,6 +2119,7 @@ int CGame::RunDifficultySelectionMode() {
 		dtc.DrawInRect(&textArea, 40, 0, TEXTALIGN_CENTERXY|TEXTSCALE_NONE, dty.ConvertFromRGBA(0, 0, 0, 100), "BACK");
 
 	}
+
 	/*if (iCursor2 == 4) {
 		dtc.Draw(1780, 700, 40, 0, dty.ConvertFromRGBA(0, 0, 0, 200), "OPTION");
 	}
@@ -2125,7 +2139,7 @@ int CGame::RunDifficultySelectionMode() {
 ///////////////////////////////////////////////
 // 演奏結果モード初期化
 ///////////////////////////////////////////////
-BOOL CGame::InitResultMode() {
+bool CGame::InitResultMode() {
 	ZeroMemory(bOnVirtualKey, sizeof(bOnVirtualKey));
 
 	iCursor2 = 0;
@@ -2144,10 +2158,11 @@ int CGame::RunResultMode() {
 
 
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
 
+	dElapsedTime = hptimer.GetTime();
 
 	if (dElapsedTime > 15.0) {
 		// 15秒経つと自動で画面遷移する
@@ -2162,15 +2177,15 @@ int CGame::RunResultMode() {
 	// 入力処理関係
 	///////////////////////////////////////////////////////////////////////////////////////
 	// キーボード入力
-	BYTE key[256];
+	unsigned char key[256];
 	di.GetKeyboard(key);
 
 	// midiキーボード入力
 	MIDIKEYSTATE midiKey[MIDIKEYCNT];
-	BOOL getMidiKeyFlag = mi.GetKeyState(midiKey);
+	bool getMidiKeyFlag = mi.GetKeyState(midiKey);
 
 	// 仮想入力キーへ変換
-	BOOL pressVirtualKey[VIRTUALKEYCNT];
+	bool pressVirtualKey[VIRTUALKEYCNT];
 	ZeroMemory(pressVirtualKey, sizeof(pressVirtualKey));
 
 	if (dElapsedTime > 0.5) {	// 前画面時の多重入力による誤操作を防ぐ
@@ -2403,7 +2418,7 @@ int CGame::RunResultMode() {
 ///////////////////////////////////////////////
 // 演奏モードの終了処理
 ///////////////////////////////////////////////
-BOOL CGame::ExitPlayMusicMode() {
+bool CGame::ExitPlayMusicMode() {
 
 	// キー音の解放
 	for (int i=0; i<BMS_MAXINDEX; i++) {
@@ -2432,11 +2447,13 @@ BOOL CGame::ExitPlayMusicMode() {
 	return TRUE;
 }
 
-BOOL CGame::RunScreenTransition(double stime) {
+bool CGame::RunScreenTransition(double stime) {
 	// 開始時から経過した時間を算出
-	LARGE_INTEGER li;
-	QueryPerformanceCounter(&li);
-	dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter(&li);
+	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
+	
+	dElapsedTime = hptimer.GetTime();
 
 	if (dElapsedTime > stime) {
 		return 1;
@@ -2483,7 +2500,7 @@ BOOL CGame::RunScreenTransition(double stime) {
 	return 0;
 }
 
-BOOL CGame::RunLoadingScreen() {
+bool CGame::RunLoadingScreen() {
 
 	////////////////////////////////////////////////////////////////////////////////////
 	// デバイスロストチェック(フルスクリーン時にALT+TABを押した場合など)
@@ -2534,10 +2551,10 @@ BOOL CGame::RunLoadingScreen() {
 /////////////////////////////////////////////////////////////////////////
 // ゲームメインルーチン
 /////////////////////////////////////////////////////////////////////////
-BOOL CGame::Run(HINSTANCE hinst) {
+bool CGame::Run(HINSTANCE hinst) {
 	// ゲームメインループ
 	MSG msg;
-	BOOL bLoop=TRUE;
+	bool bLoop=TRUE;
 	while (bLoop) {
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (msg.message==WM_QUIT) {
@@ -2581,9 +2598,14 @@ BOOL CGame::Run(HINSTANCE hinst) {
 					eState = G_TITLE;
 
 					// 現在の時間を開始時間とする
-					LARGE_INTEGER li;
-					QueryPerformanceCounter(&li);
-					llStartTime = li.QuadPart;
+					//LARGE_INTEGER li;
+					//QueryPerformanceCounter(&li);
+					//llStartTime = li.QuadPart;
+
+					hptimer.Pause();
+					hptimer.Reset();
+					hptimer.Start();
+
 				}
 
 			case G_TITLE:
@@ -2596,9 +2618,13 @@ BOOL CGame::Run(HINSTANCE hinst) {
 						eState = G_TITLEFADEOUT;
 
 						// 現在の時間を開始時間とする
-						LARGE_INTEGER li;
-						QueryPerformanceCounter(&li);
-						llStartTime = li.QuadPart;
+						//LARGE_INTEGER li;
+						//QueryPerformanceCounter(&li);
+						//llStartTime = li.QuadPart;
+
+						hptimer.Pause();
+						hptimer.Reset();
+						hptimer.Start();
 
 						break;
 					case 1:
@@ -2628,9 +2654,14 @@ BOOL CGame::Run(HINSTANCE hinst) {
 					eState = G_SELECTMUSIC;
 
 					// 現在の時間を開始時間とする
-					LARGE_INTEGER li;
-					QueryPerformanceCounter(&li);
-					llStartTime = li.QuadPart;
+					//LARGE_INTEGER li;
+					//QueryPerformanceCounter(&li);
+					//llStartTime = li.QuadPart;
+
+					hptimer.Pause();
+					hptimer.Reset();
+					hptimer.Start();
+
 				}
 
 				break;
@@ -2662,9 +2693,13 @@ BOOL CGame::Run(HINSTANCE hinst) {
 						eState = G_SELECTDIFFICULTY;
 
 						// 現在の時間を開始時間とする
-						LARGE_INTEGER li;
-						QueryPerformanceCounter(&li);
-						llStartTime = li.QuadPart;
+						//LARGE_INTEGER li;
+						//QueryPerformanceCounter(&li);
+						//llStartTime = li.QuadPart;
+
+						hptimer.Pause();
+						hptimer.Reset();
+						hptimer.Start();
 
 						break;
 					default:
@@ -2682,9 +2717,13 @@ BOOL CGame::Run(HINSTANCE hinst) {
 						eState = G_SELECTDIFFFADEOUT;
 
 						// 現在の時間を開始時間とする
-						LARGE_INTEGER li;
-						QueryPerformanceCounter(&li);
-						llStartTime = li.QuadPart;
+						//LARGE_INTEGER li;
+						//QueryPerformanceCounter(&li);
+						//llStartTime = li.QuadPart;
+						
+						hptimer.Pause();
+						hptimer.Reset();
+						hptimer.Start();
 
 						break;
 					case 1:
@@ -2740,9 +2779,13 @@ BOOL CGame::Run(HINSTANCE hinst) {
 						Sleep(100);		// 前処理が確実に終わるように、少しだけ待機
 
 						// 現在の時間を開始時間とする
-						LARGE_INTEGER li;
-						QueryPerformanceCounter(&li);
-						llStartTime = li.QuadPart;
+						//LARGE_INTEGER li;
+						//QueryPerformanceCounter(&li);
+						//llStartTime = li.QuadPart;
+
+						hptimer.Pause();
+						hptimer.Reset();
+						hptimer.Start();
 
 						break;
 					default:
@@ -2774,10 +2817,13 @@ BOOL CGame::Run(HINSTANCE hinst) {
 						eState = G_RESULT;
 
 						// 現在の時間を開始時間とする
-						LARGE_INTEGER li;
-						QueryPerformanceCounter(&li);
-						llStartTime = li.QuadPart;
+						//LARGE_INTEGER li;
+						//QueryPerformanceCounter(&li);
+						//llStartTime = li.QuadPart;
 
+						hptimer.Pause();
+						hptimer.Reset();
+						hptimer.Start();
 
 						break;
 				}
@@ -2849,7 +2895,7 @@ BOOL CGame::Run(HINSTANCE hinst) {
 /////////////////////////////////////////////////////////////
 // 登録した全ての譜面データのヘッダだけロードする
 /////////////////////////////////////////////////////////////
-BOOL CGame::LoadAllBmsHeader(const char *scoreFileData) {
+bool CGame::LoadAllBmsHeader(const char *scoreFileData) {
 	FILE *fp;
 	if ((fp = fopen(scoreFileData, "r")) == NULL) {
 		DEBUG("ファイル \"%s\"が見つかりません。", scoreFileData);
@@ -2884,7 +2930,7 @@ BOOL CGame::LoadAllBmsHeader(const char *scoreFileData) {
 	return TRUE;
 }
 
-BOOL CGame::InputVirtualKey(BOOL *virtualKey, MIDIKEYSTATE *midiKey, BYTE *keyboard, BOOL IsUseMidi) {
+bool CGame::InputVirtualKey(bool *virtualKey, MIDIKEYSTATE *midiKey, unsigned char *keyboard, bool IsUseMidi) {
 	if (virtualKey == NULL) return FALSE;
 
 
@@ -2913,7 +2959,7 @@ BOOL CGame::InputVirtualKey(BOOL *virtualKey, MIDIKEYSTATE *midiKey, BYTE *keybo
 			DIK_Z, DIK_X, DIK_C, DIK_V, DIK_B, DIK_N, DIK_M, DIK_COMMA, DIK_PERIOD, DIK_SLASH, DIK_BACKSLASH, DIK_RSHIFT, DIK_NUMPAD1, DIK_NUMPAD2, DIK_NUMPAD3,
 		};
 
-		BOOL on[VIRTUALKEYCNT];
+		bool on[VIRTUALKEYCNT];
 		for (int i=0; i<VIRTUALKEYCNT; i++) {
 			on[i] = bOnVirtualKey[i];	// バックアップ
 		}
