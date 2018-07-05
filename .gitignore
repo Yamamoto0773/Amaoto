@@ -82,6 +82,9 @@ ipch/
 *.psess
 *.vsp
 *.vspx
+*.props
+*.vcxproj
+*.vcxproj.filters
 
 # TFS 2012 Local Workspace
 $tf/
@@ -214,3 +217,15 @@ ModelManifest.xml
 
 # for Mac
 *.DS_Store
+
+
+
+FILES/
+libfiles/
+DX9Wrapper_v0.2.0/
+DEBUG.TXT
+*.exe
+
+
+MUSIC/
+LoadScoreFile.txt
