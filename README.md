@@ -1,9 +1,17 @@
 # Amaoto
 自作音楽ゲーム[Amaoto]です．
+実行ファイルとサンプル曲を封入したzipは[こちら](https://github.com/Yamamoto0773/Amaoto/releases)です．
 
 ### 概要
 DirectX9.0を使って作り始めた趣味の音楽ゲームです．
 beatmaniaのようなショット音(キー音）がある音ゲーになっています．
+
+### 遊び方
+本ゲームはPCのキーボードまたはMIDIキーボードで操作します．<br/>
+キーボードの左側のキーを押すと左へ移動，右側のキーを押すと右へ移動，真ん中あたりのキーを押すと次の画面に進みます．
+演奏中は，ノートが落ちてきた位置のキーを押すことで操作することができます．
+また，Qキーを押すとタイトルへ戻ります．
+
 
 ### ライセンス (about License)
 (This software is released under the BSD 2-clause "Simplified" License, see LICENSE.md)
