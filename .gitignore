@@ -219,8 +219,7 @@ ModelManifest.xml
 *.DS_Store
 
 
-libfiles/
-DX9Wrapper_v0.2.0/
+
 DEBUG.TXT
 *.exe
 
