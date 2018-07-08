@@ -3,6 +3,7 @@
 // resource.rc で使用
 //
 #define IDI_ICON1                       101
+#define RESID_EFFECT_FX                 102
 
 // Next default values for new objects
 // 

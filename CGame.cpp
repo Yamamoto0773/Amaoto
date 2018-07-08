@@ -43,6 +43,9 @@ CGame::CGame() {
 	for (i=0; i<VIRTUALKEYCNT; i++)
 		lHoldNote[i] = -1;
 
+
+	logfile.init("DEBUG.TXT");
+
 }
 
 
@@ -67,32 +70,17 @@ bool CGame::Init(HINSTANCE hinst) {
 	}
 	ImmAssociateContext(win.hWnd, NULL);			// IMEを出さないようにする
 
-	// Direct3D生成
-	// フルスクリーンの1920*1080の32bitカラーにセットする。
-	// ※2つ目の引数をFALSEにするとウインドウモードに出来る
-	if (!dd.Create(win.hWnd, FALSE, 1920, 1080, 32, 0, TRUE)) {
-		DEBUG("Direct3D create error\n");
-		return FALSE;
+
+	backbufferWidth = 1920;
+	backbufferHeight = 1080;
+
+	auto &dmng = dx9::DXDrawManager::GetInstance();
+	dmng.SetLogWriteDest(&logfile);
+	if (!dmng.Create(win.hWnd, { (size_t)backbufferWidth, (size_t)backbufferHeight }, dx9::MultiSampleLv::NONE)) {
+		return false;
 	}
 
-	// DirectXText初期化
-	if (!dty.Init(dd.GetD3DDevice(), 1920, 1080)) {
-		DEBUG("DirextXFont Init error\n");
-	}
 
-	// DXTextANSI初期化
-	if (!dtc.Init(dd.GetD3DDevice(), 1920, 1080)) {
-		DEBUG("DXTextANSI Init error\n");
-	}
-	if (!dtcs.Init(dd.GetD3DDevice(), 1920, 1080)) {
-		DEBUG("DXTextANSI Init error\n");
-	}
-	if (!dts.Init(dd.GetD3DDevice(), 1920, 1080)) {
-		DEBUG("DXTextANSI Init error\n");
-	}
-	// DirectXFigure初期化
-	if (!df.Init(dd.GetD3DDevice()))
-		DEBUG("DirectXFigure Init error\n");
 
 	// DirectSound生成
 	if (!ds.Create(win.hWnd)) {
@@ -119,6 +107,8 @@ bool CGame::Init(HINSTANCE hinst) {
 		//		return FALSE;				// ジョイスティックが使用できなくても起動可能とする
 	}
 
+	di.CreateMouse();
+
 
 	// MIDIキーボード入力の準備
 	if (!mi.Create()) {
@@ -127,95 +117,50 @@ bool CGame::Init(HINSTANCE hinst) {
 	}
 
 
-	// 画像ロード
-	if (!dd.AddTexture(TEXFILE_IMAGE0, "FILES\\image0.png")) {
-		DEBUG("image.png load error\n");
-		return FALSE;
-	}
-	if (!dd.AddTexture(TEXFILE_IMAGE1, "FILES\\image1.png")) {
-		DEBUG("image1.png load error\n");
-		return FALSE;
-	}
-	if (!dd.AddTexture(TEXFILE_IMAGE2, "FILES\\image2.png")) {
-		DEBUG("image2.png load error\n");
-		return FALSE;
-	}
-	if (!dd.AddTexture(TEXFILE_IMAGE3, "FILES\\image3.png")) {
-		DEBUG("image3.png load error\n");
-		return FALSE;
-	}
-	if (!dd.AddTexture(TEXFILE_IMAGE4, "FILES\\image4.png")) {
-		DEBUG("image4.png load error\n");
-	}
-	if (!dd.AddTexture(TEXFILE_IMAGE5, "FILES\\image5.png")) {
-		DEBUG("image5.png load error\n");
-	}
-	if (!dd.AddTexture(TEXFILE_IMAGE6, "FILES\\image6.png")) {
-		DEBUG("image6.png load error\n");
-	}
-	if (!dd.AddTexture(TEXFILE_IMAGE7, "FILES\\image7.png")) {
-		DEBUG("image7.png load error\n");
-	}
-	if (!dd.AddTexture(TEXFILE_IMAGE8, "FILES\\image8.png")) {
-		DEBUG("image8.png load error\n");
-	}
+	auto &tmng = DXTextureManager::GetInstance();
+	tmng.CreateFromFile(tex_judgeline, L"FILES\\image0.png", {0, 992, 1920, 15});
+	tmng.CreateFromFile(tex_judgelineeffect, L"FILES\\image0.png", {0, 899, 1920, 76});
+	tmng.CreateFromFile(tex_note, L"FILES\\image0.png", {62, 475, 150, 227});
+
+	noteScale = 0.3f;
+
+	tmng.CreateFromFile(tex_judgestr_early2, L"FILES\\image1.png", {0, 0, 227, 123});
+	tmng.CreateFromFile(tex_judgestr_early, L"FILES\\image1.png", {0, 130, 227, 123});
+	tmng.CreateFromFile(tex_judgestr_juste, L"FILES\\image1.png", {0, 260, 180, 123});
+	tmng.CreateFromFile(tex_judgestr_just, L"FILES\\image1.png", {0, 390, 180, 123});
+	tmng.CreateFromFile(tex_judgestr_justl, L"FILES\\image1.png", {0, 520, 180, 123});
+	tmng.CreateFromFile(tex_judgestr_late, L"FILES\\image1.png", {0, 650, 211, 123});
+	tmng.CreateFromFile(tex_judgestr_late2, L"FILES\\image1.png", {0, 780, 211, 123});
+	tmng.CreateFromFile(tex_judgestr_miss, L"FILES\\image1.png", {0, 910, 191, 123});
+	tmng.CreateFromFile(tex_judgeeffect_just, L"FILES\\image1.png", {180, 390, 180, 123});
+	
+	tmng.CreateFromFile(tex_diffbox_elementary, L"FILES\\image3.png", {7, 8, 564, 618});
+	tmng.CreateFromFile(tex_diffbox_intermediate, L"FILES\\image3.png", {607, 8, 564, 618});
+	tmng.CreateFromFile(tex_diffbox_advanced, L"FILES\\image3.png", { 1207, 8, 564, 618 });
+	tmng.CreateFromFile(tex_diffbox_master, L"FILES\\image3.png", {7, 658, 564, 618});
+	tmng.CreateFromFile(tex_diffbox_professional, L"FILES\\image3.png", {607, 658, 564, 618});
+	tmng.CreateFromFile(tex_diffbox_shade, L"FILES\\image3.png", {1207, 658, 564, 618});
+	
+	tmng.CreateFromFile(tex_jacketbox, L"FILES\\image4.png", {15, 11, 514, 672});
+	tmng.CreateFromFile(tex_scorebox, L"FILES\\image4.png", {553, 14, 1088, 537});
+	tmng.CreateFromFile(tex_bigjacketbox, L"FILES\\image4.png", {12, 714, 1698, 590});
+	tmng.CreateFromFile(tex_resultjacketbox, L"FILES\\image4.png", {13, 1929, 514, 766});
+	tmng.CreateFromFile(tex_jacketbox_shade, L"FILES\\image4.png", {1166, 1952, 514, 672});
+	tmng.CreateFromFile(tex_bigjacketbox_shade, L"FILES\\image4.png", {8, 1326, 1698, 590});
+	tmng.CreateFromFile(tex_resultjacketbox_shade, L"FILES\\image4.png", {626, 1946, 514, 766});
+
+	tmng.CreateFromFile(tex_rippleglay, L"FILES\\image0.png", {336, 35, 399, 399});
+	tmng.CreateFromFile(tex_ripplewhite, L"FILES\\image0.png", {1152, 60, 600, 600});
+
+	tmng.CreateFromFile(tex_backgnd_musicselection, L"FILES\\image5.png", {0, 0, 1920, 1080});
+	tmng.CreateFromFile(tex_backgnd_title, L"FILES\\image7.png", {0, 0, 1920, 1080});
+	tmng.CreateFromFile(tex_logo_amaoto, L"FILES\\image6.png", {14, 202, 1561, 183});
+	tmng.CreateFromFile(tex_logo_amatsubu , L"FILES\\image6.png", {1661, 122, 191, 302});
+	tmng.CreateFromFile(tex_backgnd_white, L"FILES\\image8.png", {0, 0, 1920, 1080});
+
+	tmng.CreateFromFile(tex_buttoneffect, L"FILES\\image0.png", {586, 536, 439, 168});
 
 
-	// 判定ライン
-	dd.SetPutRange(TEX_JUDGELINE, TEXFILE_IMAGE0, 0, 992, 1940, 15);
-
-	// 判定ラインのエフェクト
-	dd.SetPutRange(TEX_JUDGELINEEFFECT, TEXFILE_IMAGE0, 0, 899, 1940, 76);
-
-	//// ノートレーン
-	//dd.SetPutRange(2, 0, 72, 838, 1768, 8);
-
-	// ノート
-	dd.SetPutRange(TEX_NOTE, TEXFILE_IMAGE0, 62, 475, 150, 227);
-	dd.SetPutStatus(TEX_NOTE, 1.0f, 0.3f, 0.0f);
-
-	// 判定文字
-	dd.SetPutRange(TEX_JUDGESTR_EARLY2, TEXFILE_IMAGE1, 0, 0, 227, 123);
-	dd.SetPutRange(TEX_JUDGESTR_EARLY, TEXFILE_IMAGE1, 0, 130, 227, 123);
-	dd.SetPutRange(TEX_JUDGESTR_JUSTE, TEXFILE_IMAGE1, 0, 260, 180, 123);
-	dd.SetPutRange(TEX_JUDGESTR_JUST, TEXFILE_IMAGE1, 0, 390, 180, 123);
-	dd.SetPutRange(TEX_JUDGESTR_JUSTL, TEXFILE_IMAGE1, 0, 520, 180, 123);
-	dd.SetPutRange(TEX_JUDGESTR_LATE, TEXFILE_IMAGE1, 0, 650, 211, 123);
-	dd.SetPutRange(TEX_JUDGESTR_LATE2, TEXFILE_IMAGE1, 0, 780, 211, 123);
-	dd.SetPutRange(TEX_JUDGESTR_MISS, TEXFILE_IMAGE1, 0, 910, 191, 123);
-
-	dd.SetPutRange(TEX_JUDGEEFFECT_JUST, TEXFILE_IMAGE1, 180, 390, 180, 123);
-
-
-	// 難易度選択ボックス
-	dd.SetPutRange(TEX_DIFFBOX_ELEMENTARY, TEXFILE_IMAGE3, 7, 8, 564, 618);
-	dd.SetPutRange(TEX_DIFFBOX_INTERMEDIATE, TEXFILE_IMAGE3, 607, 8, 564, 618);
-	dd.SetPutRange(TEX_DIFFBOX_ADVANCED, TEXFILE_IMAGE3, 1207, 8, 564, 618);
-	dd.SetPutRange(TEX_DIFFBOX_MASTER, TEXFILE_IMAGE3, 7, 658, 564, 618);
-	dd.SetPutRange(TEX_DIFFBOX_PROFESSIONAL, TEXFILE_IMAGE3, 607, 658, 564, 618);
-	dd.SetPutRange(TEX_DIFFBOX_SHADE, TEXFILE_IMAGE3, 1207, 658, 564, 618);
-
-	// ジャケットボックス系
-	dd.SetPutRange(TEX_JACKETBOX, TEXFILE_IMAGE4, 15, 11, 514, 672);
-	dd.SetPutRange(TEX_SCOREBOX, TEXFILE_IMAGE4, 553, 14, 1088, 537);
-	dd.SetPutRange(TEX_BIGJACKETBOX, TEXFILE_IMAGE4, 12, 714, 1698, 590);
-	dd.SetPutRange(TEX_RESULTJACKETBOX, TEXFILE_IMAGE4, 13, 1929, 514, 766);
-	dd.SetPutRange(TEX_JACKETBOX_SHADE, TEXFILE_IMAGE4, 1166, 1952, 514, 672);
-	dd.SetPutRange(TEX_BIGJACKETBOX_SHADE, TEXFILE_IMAGE4, 8, 1326, 1698, 590);
-	dd.SetPutRange(TEX_RESULTJACKETBOX_SHADE, TEXFILE_IMAGE4, 626, 1946, 514, 766);
-
-	// 波紋
-	dd.SetPutRange(TEX_RIPPLEGLAY, TEXFILE_IMAGE0, 336, 35, 399, 399);
-	dd.SetPutRange(TEX_RIPPLEWHITE, TEXFILE_IMAGE0, 1152, 60, 600, 600);
-
-	// 背景画像
-	dd.SetPutRange(TEX_BACKGND_MUSICSELECTION, TEXFILE_IMAGE5, 0, 0, 1920, 1080);
-	dd.SetPutRange(TEX_BACKGND_TITLE, TEXFILE_IMAGE7, 0, 0, 1920, 1080);
-	dd.SetPutRange(TEX_LOGO_AMAOTO, TEXFILE_IMAGE6, 14, 202, 1561, 183);
-	dd.SetPutRange(TEX_LOGO_AMATSUBU, TEXFILE_IMAGE6, 1661, 122, 191, 302);
-	dd.SetPutRange(TEX_BACKGND_WHITE, TEXFILE_IMAGE8, 0, 0, 1920, 1080);
-
-	dd.SetPutRange(TEX_BUTTONEFFECT, TEXFILE_IMAGE0, 586, 536, 439, 168);
 
 
 	ShowWindow(win.hWnd, SW_SHOW);
@@ -256,7 +201,7 @@ bool CGame::Clear(void) {
 	int i;
 
 	ds.Clear();
-	dd.Clear();
+	//dd.Clear();
 	mi.Clear();
 	for (i=0; i<MAXMUSICCNT; i++) {
 		bms[i].ClearAll();
@@ -281,25 +226,30 @@ bool CGame::InitGame() {
 	/////////////////////////////////////////////////////
 	// 表示する文字列の登録
 
-	dtc.Create(72, 500, L"Century Gothic", false);
-	dtcs.Create(30, 500, L"Century Gothic", false);
-	dts.Create(14, 500, L"Microsoft Sans Serif", false);
+	dtc.Create("Century Gothic", 72, FontWeight::NORMAL);
+	dtcs.Create("Century Gothic", 30, FontWeight::NORMAL);
+	dts.Create("Microsoft Sans Serif", 14, FontWeight::NORMAL);
 
 	char buf[MAX_PATH];
 	char buf2[MAX_PATH];
+	wchar_t buf3[256];
 	int cnt;
 
-	FONTSTATUS fs;
-	dty.SetFontStatus(&fs, 64, L"游ゴシック", 900, false);
+	dty.Create(L"游ゴシック", 64, FontWeight::SEMIBOLD);
 
 	for (i=0; i<iLoadMusicCnt; i++) {
 		LPBMSHEADER h = bms[i].GetHeader();
 
 		// 曲情報文字登録
-		dty.SetString(TEXT_MUSICTITLE00+i, &fs, "%s", h->mTitle);
-		dty.SetString(TEXT_MUSICARTIST00+i, &fs, "%s", h->mArtist);
-		dty.SetString(TEXT_MUSICSUBTITLEA00+i, &fs, "%s", h->mSubTitle[0]);
-		dty.SetString(TEXT_MUSICSUBTITLEB00+i, &fs, "%s", h->mSubTitle[1]);
+
+		mbstowcs(buf3, h->mTitle, 256);
+		dty.StoreFontTex(buf3);
+		mbstowcs(buf3, h->mArtist, 256);
+		dty.StoreFontTex(buf3);
+		mbstowcs(buf3, h->mSubTitle[0], 256);
+		dty.StoreFontTex(buf3);
+		mbstowcs(buf3, h->mSubTitle[1], 256);
+		dty.StoreFontTex(buf3);
 
 		// ジャケット写真のロード
 		ZeroMemory(buf, sizeof(buf));
@@ -311,22 +261,17 @@ bool CGame::InitGame() {
 		}
 		strncpy(buf, h->mDataFilePath, j);		// 譜面データのあるディレクトリのパスを生成
 
-		dd.DrawBegin(FALSE);				// 描画キャッシュ用に描画を開始する(クリアはせずに前回描画された状態を残す)
+
+		auto &tmng = DXTextureManager::GetInstance();
+		
 		if (strlen(h->mJacket)>0) {
 			// 画像ファイル名の生成
 			sprintf(buf2, "%s/%s", buf, h->mJacket);
+			mbstowcs(buf3, buf2, 256);
 			// テクスチャロード
-			dd.AddTexture(i+TEXFILE_JACKET00, buf2);
+			tmng.CreateFromFile(tex_jacket[i], buf3);
 			// テクスチャクラスを取得
-			CDDTexPro90 *tex = dd.GetTexClass(i+TEXFILE_JACKET00);
-			// 画像のサイズで切り抜き
-			dd.SetPutRange(TEX_JACKET00+i, i+TEXFILE_JACKET00, 0, 0, tex->GetWidth(), tex->GetHeight());
-			// 描画キャッシュ
-			dd.SetPutStatus(TEX_JACKET00+i, 0.0f);		// 透明にする
-			dd.Put(TEX_JACKET00+i, 0, 0);
-			dd.SetPutStatus(TEX_JACKET00+i, 1.0f);		// 元に戻す
 		}
-		dd.DrawEnd();						// 描画キャッシュ終了(透明で描画したので実際には前回の描画画像のまま)
 
 	}
 
@@ -396,36 +341,26 @@ bool CGame::InitPlayMusicMode(long musicID, DIFFICULTY diff) {
 
 	// 背景用動画/画像ファイルの読み込み
 	setlocale(LC_CTYPE, "japanese");
-	const D3DPRESENT_PARAMETERS *param = dd.GetD3DPRESENT_PARAMETERS();
+	auto &dmng = DXDrawManager::GetInstance();
+	auto &tmng = DXTextureManager::GetInstance();
+	RECT clientRect;
+	GetClientRect(win.hWnd, &clientRect);
 	for (i=0; i<BMS_MAXINDEX; i++) {
 		ZeroMemory(buf2, sizeof(buf2));
 		BACKMEDIA *media = bms[musicID].GetBackMedia(i);
 		if (media->type == BKMEDIATYPE_NONE) continue;
 
 		sprintf(buf2, "%s/%s", buf, media->mFileName);
+		mbstowcs(buf3, buf2, 256);
 		if (media->type == BKMEDIATYPE_IMAGE) {
-			if (!dd.AddTexture(TEXFILE_BKGNDIMAGE00+i, buf2)) {
+			if (!tmng.CreateFromFile(tex_backgnd[i], buf3)) {
 				// ロードエラー時
 				bms[musicID].ResetBkmediaType(i);
-			}
-			else {
-				CDDTexPro90 *tex = dd.GetTexClass(TEXFILE_BKGNDIMAGE00+i);
-				dd.SetPutRange(TEX_BKGND00+i, TEXFILE_BKGNDIMAGE00+i, 0, 0, tex->GetWidth(), tex->GetHeight());
-
-				// 表示倍率の設定
-				float scale = 1.0f;
-				if (tex->GetWidth()/tex->GetHeight() > param->BackBufferWidth/param->BackBufferHeight) {
-					scale = (float)param->BackBufferWidth/(float)tex->GetWidth();
-				}
-				else {
-					scale = (float)param->BackBufferHeight/(float)tex->GetHeight();
-				}
-				dd.SetPutStatus(TEX_BKGND00+i, 1.0f, scale, 0.0f);
 			}
 		}
 		else if (media->type == BKMEDIATYPE_MOVIE) {
 			mbstowcs(buf3, buf2, sizeof(buf3));
-			if (!dm.Create(dd.GetD3DDevice(), buf3, FALSE, param->BackBufferWidth, param->BackBufferHeight)) {
+			if (!dm.Create(const_cast<IDirect3DDevice9*>(dmng._GetDirect3DDev9()), buf3, FALSE, backbufferWidth, backbufferHeight)) {
 				bms[musicID].ResetBkmediaType(i);
 			}
 			break;
@@ -433,20 +368,20 @@ bool CGame::InitPlayMusicMode(long musicID, DIFFICULTY diff) {
 	}
 
 	bIsBackMedia = bms[musicID].CheckIsBackMedia();
-	if (!bIsBackMedia) {
-		// 背景メディアが存在しないならジャケットを表示
+	//if (!bIsBackMedia) {
+	//	// 背景メディアが存在しないならジャケットを表示
 
-		// 表示倍率の設定
-		float scale = 1.0f;
-		CDDTexPro90 *tex = dd.GetTexClass(TEXFILE_JACKET00+musicID);
-		if (tex->GetWidth()/tex->GetHeight() > param->BackBufferWidth/param->BackBufferHeight) {
-			scale = (float)param->BackBufferWidth/(float)tex->GetWidth();
-		}
-		else {
-			scale = (float)param->BackBufferHeight/(float)tex->GetHeight();
-		}
-		dd.SetPutStatus(TEX_JACKET00+musicID, 0.5f, scale, 0.0f);
-	}
+	//	// 表示倍率の設定
+	//	float scale = 1.0f;
+	//	CDDTexPro90 *tex = dd.GetTexClass(TEXFILE_JACKET00+musicID);
+	//	if (tex->GetWidth()/tex->GetHeight() > backbufferWidth/backbufferHeight) {
+	//		scale = (float)backbufferWidth/(float)tex->GetWidth();
+	//	}
+	//	else {
+	//		scale = (float)backbufferHeight/(float)tex->GetHeight();
+	//	}
+	//	dd.SetPutStatus(TEX_JACKET00+musicID, 0.5f, scale, 0.0f);
+	//}
 
 
 	// スコア計算の準備
@@ -468,8 +403,8 @@ bool CGame::InitPlayMusicMode(long musicID, DIFFICULTY diff) {
 		lHoldNote[i] = -1;
 
 	// 背景色を黒に設定
-	dd.SetBackColor(0x000000);
-
+	dmng.SetBackGroundColor(0);
+	
 	return TRUE;
 }
 
@@ -500,7 +435,7 @@ bool CGame::InitTitle() {
 		}
 	}*/
 
-	dd.SetBackColor(0xffffff);
+	DXDrawManager::GetInstance().SetBackGroundColor(0xffffff);
 
 	bFlag = TRUE;
 
@@ -511,9 +446,6 @@ int CGame::RunTitle() {
 	int i, j, k;
 
 	// 開始時から経過した時間を算出
-	//LARGE_INTEGER li;
-	//QueryPerformanceCounter(&li);
-	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
 
 	dElapsedTime = hptimer.GetTime();
 
@@ -592,54 +524,40 @@ int CGame::RunTitle() {
 	}
 
 
-
-	////////////////////////////////////////////////////////////////////////////////////
-	// デバイスロストチェック(フルスクリーン時にALT+TABを押した場合など)
-	// ※復帰時は内部で管理しているテクスチャは自動的にリストアされるが、
-	//   MANAGEDではない頂点バッファやテクスチャを使用している場合は、
-	//   自分でロスト＆リストア処理を行う
-	////////////////////////////////////////////////////////////////////////////////////
-	if (!dd.CheckDevice()) {
-		// ロスト中なら
-		if (!bLostDevice) {
-			// ロスト直後ならここで開放処理を行う
-			DEBUG("デバイスがロストした\n");
-
-			bLostDevice = TRUE;
-		}
-
-		// 描画せずに抜ける
-		return 1;
-	}
-
-	if (bLostDevice) {
-		// リストア直後ならここで再構築を行う
-		DEBUG("リストアされた\n");
-
-		bLostDevice = FALSE;
-	}
-
-
-
 	//////////////////////////////////////////////////////
 	// 描画処理
 	//////////////////////////////////////////////////////
-	dd.DrawBegin();
+	auto &dmng = DXDrawManager::GetInstance();
+	auto &tmng = DXTextureManager::GetInstance();
+	dmng.DrawBegin(true);
+
+	dmng.SetBlendMode(BLENDMODE::NORMAL);
 
 	// 背景
 	float alpha = (float)((dElapsedTime - 4.1)*2);
 	if (alpha < 0.0f) alpha = 0.0f;
 	else if (alpha > 1.0f) alpha = 1.0f;
-	dd.SetPutStatus(TEX_BACKGND_TITLE, alpha, 1.0f, 0.0f);
-	dd.Put(TEX_BACKGND_TITLE, 0, 0);
+	//dmng.SetPutStatus(TEX_BACKGND_TITLE, alpha, 1.0f, 0.0f);
+	//dd.Put(TEX_BACKGND_TITLE, 0, 0);
+	tmng.SetDrawTexCoord(DrawTexCoord::TOP_L);
+	tmng.DrawTexture(tex_backgnd_title, 0, 0, 1.0f, 1.0f, alpha);
 
+
+	tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
 
 	// 波紋
 	if (dElapsedTime > 3.0) {
 		for (i=0; i<ELEMENTSIZE(iRippleEffectCount); i++) {
 			if (iRippleEffectCount[i].count > 0) {
-				dd.SetPutStatus(TEX_RIPPLEGLAY, (float)iRippleEffectCount[i].count/RIPPLEEFFECTCNT, (RIPPLEEFFECTCNT - iRippleEffectCount[i].count)/(float)JUDGEEFFECTCNT, 0.0f);
-				dd.Put2(TEX_RIPPLEGLAY, iRippleEffectCount[i].x, iRippleEffectCount[i].y);
+			
+				tmng.DrawTexture(
+					tex_rippleglay, 
+					iRippleEffectCount[i].x, 
+					iRippleEffectCount[i].y,
+					(RIPPLEEFFECTCNT - iRippleEffectCount[i].count)/(float)JUDGEEFFECTCNT,
+					(RIPPLEEFFECTCNT - iRippleEffectCount[i].count)/(float)JUDGEEFFECTCNT,
+					(float)iRippleEffectCount[i].count/RIPPLEEFFECTCNT
+					);
 			}
 		}
 	}
@@ -648,23 +566,27 @@ int CGame::RunTitle() {
 	alpha = (float)((dElapsedTime - 2.9)*3);
 	if (alpha < 0.0f) alpha = 0.0f;
 	else if (alpha > 1.0f) alpha = 1.0f;
-	dd.SetPutStatus(TEX_LOGO_AMATSUBU, alpha, 0.5f, 0.0f);
-	dd.Put2(TEX_LOGO_AMATSUBU, 1420, 540);
-
+	
+	tmng.DrawTexture(tex_logo_amatsubu, 1420, 540, 0.5f, 0.5f, alpha);
 
 
 	// タイトル文字
-	dd.SetPutStatus(TEX_LOGO_AMAOTO, 0.9f, 0.5f, 0.0f);
-	dd.Put2(TEX_LOGO_AMAOTO, 860, 540);
+	
+	tmng.DrawTexture(tex_logo_amaoto, 860, 540, 0.5f, 0.5f, 0.9f);
 
 
 	if (dElapsedTime > 5.0) {
-		RECT textArea;
+		RectF textArea;
 		textArea.left = 710;
 		textArea.top  = 900;
 		textArea.right= 1210;
 		textArea.bottom = 1000;
-		dtc.DrawInRect(&textArea, 56, 5, TEXTALIGN_CENTERXY|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, (int)((dElapsedTime-5.0)*100)%200+50), "Press the button");
+		dtc.SetAlignment(TextAlign::CENTERXY);
+		dtc.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
+		dtc.SetLetterSpace(5);
+		dtc.SetFontColor(ColorRGB(0, 0, 0, (int)((dElapsedTime-5.0)*100)%200+50));
+		dtc.DrawInRect(textArea, 0, -1, 56, "Press the button");
+		dtc.SetLetterSpace(0);
 	}
 
 
@@ -683,7 +605,7 @@ int CGame::RunTitle() {
 	}*/
 
 
-	dd.DrawEnd();
+	dmng.DrawEnd();
 
 	return 1;
 }
@@ -697,10 +619,7 @@ int CGame::RunTitle() {
 int CGame::RunPlayMusicMode(long musicID, bool demo) {
 
 	// 開始時から経過した時間を算出
-	//LARGE_INTEGER li;
-	//QueryPerformanceCounter(&li);
-	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
-
+	
 	dElapsedTime = hptimer.GetTime();
 
 
@@ -1144,54 +1063,31 @@ int CGame::RunPlayMusicMode(long musicID, bool demo) {
 
 
 
-
-	////////////////////////////////////////////////////////////////////////////////////
-	// デバイスロストチェック(フルスクリーン時にALT+TABを押した場合など)
-	// ※復帰時は内部で管理しているテクスチャは自動的にリストアされるが、
-	//   MANAGEDではない頂点バッファやテクスチャを使用している場合は、
-	//   自分でロスト＆リストア処理を行う
-	////////////////////////////////////////////////////////////////////////////////////
-	if (!dd.CheckDevice()) {
-		// ロスト中なら
-		if (!bLostDevice) {
-			// ロスト直後ならここで開放処理を行う
-			DEBUG("デバイスがロストした\n");
-
-			bLostDevice = TRUE;
-		}
-
-		// 描画せずに抜ける
-		return 1;
-	}
-
-	if (bLostDevice) {
-		// リストア直後ならここで再構築を行う
-		DEBUG("リストアされた\n");
-
-		bLostDevice = FALSE;
-	}
-
-
-
-
-
 	////////////////////////////////////////////////////////////////////////////////////
 	// 描画処理
 	////////////////////////////////////////////////////////////////////////////////////
-	dd.DrawBegin();
+	auto &dmng = DXDrawManager::GetInstance();
+	auto &tmng = DXTextureManager::GetInstance();
+	dmng.DrawBegin(true);
 
+	tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
 
 	// 背景の表示
-	const D3DPRESENT_PARAMETERS *param = dd.GetD3DPRESENT_PARAMETERS();
+	RECT clientRect;
+	GetClientRect(win.hWnd, &clientRect);
 	if (bIsBackMedia) {
 		// 背景メディアが存在するなら
 
 		if (iBackMediaIndex >= 0) {
-			RECT rect ={ 0, 0, param->BackBufferWidth, param->BackBufferHeight };
+			RECT rect ={ 0, 0, backbufferWidth, backbufferHeight };
 			LPBACKMEDIA m = bms[musicID].GetBackMedia(iBackMediaIndex);
 			switch (m->type) {
 				case BKMEDIATYPE_IMAGE:
-					dd.Put2(TEX_BKGND00+iBackMediaIndex, param->BackBufferWidth/2.0f, param->BackBufferHeight/2.0f);
+					tmng.SetTextureAdjust(TextureAdjust::ASPECT_FIXED);
+					tmng.DrawTexture(
+						tex_backgnd[iBackMediaIndex], 
+						{0, 0, (float)backbufferWidth, (float)backbufferHeight}
+						);
 					break;
 				case BKMEDIATYPE_MOVIE:
 					dm.DrawMovie(rect, DRAWMOVOPT_ASPECTFIXED);
@@ -1200,32 +1096,31 @@ int CGame::RunPlayMusicMode(long musicID, bool demo) {
 		}
 	}
 	else {
-		//dd.Put2(TEX_JACKET00+musicID, param->BackBufferWidth/2.0f, param->BackBufferHeight/2.0f);
+		//dd.Put2(TEX_JACKET00+musicID, backbufferWidth/2.0f, backbufferHeight/2.0f);
 	}
 
 
 	// ボタンエフェクト
-	dd.SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);			// 加算合成
+	dmng.SetBlendMode(BLENDMODE::ADD);			// 加算合成
 	for (int i=0; i<VIRTUALKEYCNT; i++) {
 		if (bOnVirtualKey[i]) {
-			dd.SetPutStatus(TEX_BUTTONEFFECT, 1.0f, 0.9f, 0.0f);
-			dd.Put2(TEX_BUTTONEFFECT, i*1920/(VIRTUALKEYCNT-1), 888);
+			tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
+			tmng.DrawTexture(tex_buttoneffect, i*backbufferWidth/(VIRTUALKEYCNT-1), 888, 0.9f, 0.9f);
 		}
 	}
 
 
 
 	// 判定ラインの表示
-	dd.SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);	// 通常合成
-	dd.SetPutStatus(0, 1.0f, 1.0f, 0.0f);
-	dd.Put2(TEX_JUDGELINE, 960, 960);
+	dmng.SetBlendMode(BLENDMODE::NORMAL);// 通常合成
+	tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
+	tmng.DrawTexture(tex_judgeline, 960, 960, 1.0f);
 
 	// 判定ラインのエフェクト
 	float cnt = (float)(now_count%(BMS_RESOLUTION/4))/(BMS_RESOLUTION/4);		// 現在の時間が4分音符間のどの位置にあたるか計算(0.0<= cnt <1.0)
-	dd.SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);			// 加算合成
-	dd.SetPutStatus(TEX_JUDGELINEEFFECT, (float)(1.0+sin(M_PI+ cnt/2* M_PI)/2.0), 1.0f, 0.0f);
-	dd.Put2(TEX_JUDGELINEEFFECT, 960, 961);
-
+	dmng.SetBlendMode(BLENDMODE::ADD);			// 加算合成
+	
+	tmng.DrawTexture(tex_judgelineeffect, 960, 961, 1.0f, 1.0f, (float)(1.0+sin(M_PI+ cnt/2* M_PI)/2.0));
 
 	// ノート＆ノートレーン
 	bool flag[BMS_MAXNOTELANE] ={ false };
@@ -1237,15 +1132,15 @@ int CGame::RunPlayMusicMode(long musicID, bool demo) {
 		}
 	}
 
-	dd.SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);	// 通常合成
+	dmng.SetBlendMode(BLENDMODE::NORMAL);	// 通常合成
 	for (i=iStartNum[BMS_MAXINDEX]; i < bms[musicID].GetBmsNoteCnt(); i++) {
 		LPBMSNOTE b = bms[musicID].GetBmsNote(i);
 		LPNOTEDEFDATA n = bms[musicID].GetNoteDefData(b->lIndex);
 		LPLANE l = bms[musicID].GetLane(b->iLane);
 		float off_y = (float)((double)(b->lTime1 - now_count) / BMS_RESOLUTION * (fScrMulti * 576));
-		float off_x = (float)(((l->fTopX-l->fBottomX)*1920/967.0) *off_y);
+		float off_x = (float)(((l->fTopX-l->fBottomX)*backbufferWidth/967.0) *off_y);
 		float off_y2 = (float)((double)(b->lTime2 - now_count) / BMS_RESOLUTION * (fScrMulti * 576));
-		float off_x2 = (float)(((l->fTopX-l->fBottomX)*1920/967.0) *off_y2);
+		float off_x2 = (float)(((l->fTopX-l->fBottomX)*backbufferWidth/967.0) *off_y2);
 
 		if (off_y2 < -120) {
 			// ノートが画面外へ出たら、次回はその次のノートから描画開始する
@@ -1265,11 +1160,16 @@ int CGame::RunPlayMusicMode(long musicID, bool demo) {
 
 		// ノートレーンの描画
 		if (!flag[b->iLane]) {
-			df.strokeWidth(1.0f);
-			df.stroke(l->iColor[0], l->iColor[1], l->iColor[2], l->iColor[3]);
-			df.line(l->fBottomX*1920, 960, l->fTopX*1920, 0);
-			RECT area ={ l->fTopX*1920+10, 10, l->fTopX*1920+210, 60 };
-			dtc.DrawInRect(&area, 32, 0, TEXTALIGN_LEFT|TEXTSCALE_NONE, dtc.ConvertFromRGBA(l->iColor[0], l->iColor[1], l->iColor[2], l->iColor[3]), "%s", l->mName);
+			RectF area ={ l->fTopX*backbufferWidth+10, 10, l->fTopX*backbufferWidth+210, 60 };
+		
+			ColorRGB color(l->iColor[0], l->iColor[1], l->iColor[2], l->iColor[3]);
+			//color.set(255, 0, 0);
+			dmng.DrawLine(l->fBottomX*backbufferWidth, 960, l->fTopX*backbufferWidth, 0, color, 1.0f);
+			dtc.SetFontColor(color);
+			dtc.SetAlignment(TextAlign::LEFT);
+			dtc.SetStringAdjust(TextureAdjust::NONE);
+			dtc.DrawInRect(area, 0, -1, 32, "%s", l->mName);
+			
 			flag[b->iLane] = TRUE;
 		}
 
@@ -1277,23 +1177,42 @@ int CGame::RunPlayMusicMode(long musicID, bool demo) {
 			// ホールドノートなら
 			if (off_y < 0)
 				off_y = 0, off_x = 0;
-			df.stroke(0, 100, 255, 200);
-			df.strokeWidth(10.0f);
+			
 			if (b->bFlag1) {
 				// ホールド始点がまだ判定されていないなら
-				df.line(l->fBottomX*1920.0f + off_x, 960 + 7 - off_y, l->fBottomX*1920.0f + off_x2, 960 + 7 - off_y2);
-				dd.Put2(TEX_NOTE, l->fBottomX*1920.0f + off_x2, 960 + 7 - off_y2);				// ホールド終点ノート表示
-				dd.Put2(TEX_NOTE, l->fBottomX*1920.0f + off_x, 960 + 7 - off_y);				// ホールド始点ノート表示
+				// ホールド始点ノート表示
+				dmng.DrawLine(
+					l->fBottomX*backbufferWidth + off_x, 
+					960 + 7 - off_y, 
+					l->fBottomX*backbufferWidth + off_x2, 
+					960 + 7 - off_y2,
+					ColorRGB(0, 100, 255, 200),
+					10.0f				
+				);
+				tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
+				tmng.DrawTexture(tex_note, l->fBottomX*backbufferWidth + off_x2, 960 + 7 - off_y2, 0.3f, 0.3f);
+				tmng.DrawTexture(tex_note, l->fBottomX*backbufferWidth + off_x, 960 + 7 - off_y, 0.3f, 0.3f);
 			}
 			else {
 				// ホールド始点が判定済みなら
-				df.line(l->fBottomX*1920.0f, 960+7, l->fBottomX*1920.0f  + off_x2, 960 + 7 - off_y2);
-				dd.Put2(TEX_NOTE, l->fBottomX*1920.0f + off_x2, 960 + 7 - off_y2);				// ホールド終点ノート表示
+				// ホールド終点ノート表示
+				dmng.DrawLine(
+					l->fBottomX*backbufferWidth, 
+					960+7, 
+					l->fBottomX*backbufferWidth + off_x2, 
+					960 + 7 - off_y2,
+					ColorRGB(0, 100, 255, 200),
+					10.0f				
+				);
+				tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
+				tmng.DrawTexture(tex_note, l->fBottomX*backbufferWidth + off_x2, 960 + 7 - off_y2, 0.3f, 0.3f);
 			}
 
 		}
 		else {
-			dd.Put2(TEX_NOTE, l->fBottomX*1920.0f+ off_x, 960 + 7 - off_y);				// ノート表示
+			// ノート表示
+			tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
+			tmng.DrawTexture(tex_note, l->fBottomX*backbufferWidth+ off_x, 960 + 7 - off_y, 0.3f, 0.3f);
 		}
 	}
 
@@ -1307,23 +1226,64 @@ int CGame::RunPlayMusicMode(long musicID, bool demo) {
 			// 1/4小節の間表示
 			LPLANE n = bms[musicID].GetLane(nj->iLane);
 
-			dd.SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);	// 通常合成
+			dmng.SetBlendMode(BLENDMODE::NORMAL);	// 通常合成
 			switch (nj->eJudge) {
 				case MISS_E:
 				case HOLDBREAK:
-					dd.SetPutStatus(TEX_JUDGESTR_MISS, cnt*4/BMS_RESOLUTION, 0.5f, 0.0f);
-					dd.Put2(TEX_JUDGESTR_MISS, n->fBottomX*1920.0f, 960-250+ cnt*200/BMS_RESOLUTION);
+				
+					tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
+					tmng.DrawTexture(
+						tex_judgestr_miss,
+						n->fBottomX*backbufferWidth, 
+						960-250+ cnt*200/BMS_RESOLUTION,
+						0.5f, 0.5,
+						cnt*4/BMS_RESOLUTION
+					);
 					break;
 				case JUST:
-					dd.SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);			// 加算合成
-					dd.SetPutStatus(TEX_JUDGEEFFECT_JUST, cnt / BMS_RESOLUTION*4, 0.5f, 0.0f);
-					dd.Put2(TEX_JUDGEEFFECT_JUST, n->fBottomX*1920.0f, 960 - 250 + cnt* 200/BMS_RESOLUTION);
-					dd.SetPutStatus(TEX_JUDGESTR_JUST, cnt / BMS_RESOLUTION * 4, 0.5f, 0.0f);
-					dd.Put2(TEX_JUDGESTR_JUST, n->fBottomX*1920.0f, 960 - 250 + cnt * 200/ BMS_RESOLUTION);
+					// 加算合成
+					dmng.SetBlendMode(BLENDMODE::ADD);
+					tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
+					tmng.DrawTexture(
+						tex_judgeeffect_just,
+						n->fBottomX*backbufferWidth,
+						960 - 250 + cnt* 200/BMS_RESOLUTION,
+						0.5f, 0.5f,
+						cnt / BMS_RESOLUTION*4
+					);
+					tmng.DrawTexture(
+						tex_judgestr_just,
+						n->fBottomX*backbufferWidth, 
+						960 - 250 + cnt * 200/ BMS_RESOLUTION,
+						0.5f, 0.5f,
+						cnt / BMS_RESOLUTION*4
+					);
+
 					break;
 				default:
-					dd.SetPutStatus(nj->eJudge + TEX_JUDGESTR_JUST, cnt*4/BMS_RESOLUTION, 0.5f, 0.0f);
-					dd.Put2(nj->eJudge + TEX_JUDGESTR_JUST, n->fBottomX*1920.0f, 960 - 250+ cnt / BMS_RESOLUTION * 200);
+				
+					tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
+					// select texture
+					const Texture *texp;
+					switch (nj->eJudge) {
+					case JUDGE::EARLY2: texp = &tex_judgestr_early2;	break;
+					case JUDGE::EARLY:	texp = &tex_judgestr_early;		break;
+					case JUDGE::JUST_E: texp = &tex_judgestr_juste;		break;
+					case JUDGE::JUST_L: texp = &tex_judgestr_justl;		break;
+					case JUDGE::LATE:	texp = &tex_judgestr_late;		break;
+					case JUDGE::LATE2:	texp = &tex_judgestr_late2;		break;
+					case JUDGE::MISS_L: texp = &tex_judgestr_miss;		break;
+					default:
+						break;
+					}
+
+					tmng.DrawTexture(
+						*texp,
+						n->fBottomX*backbufferWidth, 
+						960-250+ cnt*200/BMS_RESOLUTION,
+						0.5f, 0.5,
+						cnt*4/BMS_RESOLUTION
+					);
 					break;
 			}
 		}
@@ -1333,7 +1293,7 @@ int CGame::RunPlayMusicMode(long musicID, bool demo) {
 	}
 
 	// ノートエフェクト
-	dd.SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);			// 加算合成
+	dmng.SetBlendMode(BLENDMODE::ADD);			// 加算合成
 	int size;
 	int offsetX, offsetY;
 	int alpha;
@@ -1351,18 +1311,16 @@ int CGame::RunPlayMusicMode(long musicID, bool demo) {
 				offsetY = 0;
 				offsetY = 0;
 
-				//alpha = iNoteEffectCount[j][i]*3;
-				//*df.noFill();
-				//df.strokeWidth(1.0f);
-				//df.stroke(255, 255, 255, alpha-50);
-				//df.ellipse(n->fBottomX*1920+offsetX, 960+offsetY, size+1, size+1);
-				//df.ellipse(n->fBottomX*1920+offsetX, 960+offsetY, size-1, size-1);
-				//df.strokeWidth(1.0f);
-				//df.stroke(255, 255, 255, alpha);
-				//df.ellipse(n->fBottomX*1920+offsetX, 960+offsetY, size, size);*/
+			
+				tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
+				tmng.DrawTexture(
+					tex_ripplewhite,
+					n->fBottomX*backbufferWidth, 960,
+					(float)(JUDGEEFFECTCNT-iNoteEffectCount[j][i])/JUDGEEFFECTCNT,
+					(float)(JUDGEEFFECTCNT-iNoteEffectCount[j][i])/JUDGEEFFECTCNT,
+					(float)iNoteEffectCount[j][i]/JUDGEEFFECTCNT
+				);
 
-				dd.SetPutStatus(TEX_RIPPLEWHITE, (float)iNoteEffectCount[j][i]/JUDGEEFFECTCNT, (float)(JUDGEEFFECTCNT-iNoteEffectCount[j][i])/JUDGEEFFECTCNT, 0.0f);
-				dd.Put2(TEX_RIPPLEWHITE, n->fBottomX*1920, 960);
 
 			}
 		}
@@ -1384,26 +1342,39 @@ int CGame::RunPlayMusicMode(long musicID, bool demo) {
 	else if (groove >= 110.0)
 		groove -= 10.0;
 
-	dtc.Draw(10, 100, 30, 0, dtc.ConvertFromRGBA(255, 255, 255, 200), "GROOVE");
-	dtc.Draw(127, 92, 40, 0, dtc.ConvertFromRGBA(255, 255, 255, 200), "%5.1f %%", groove);
-	df.noFill();
-	df.strokeWidth(1.0f);
-	df.stroke(255, 255, 255, 150);
-	df.rect(10, 80, 500, 14);
-	df.fill(255, 255, 255, 150);
-	df.noStroke();
-	if (groove > 100.0)
-		groove = 100.0;
-	df.rect(10, 80, groove*5, 12);
+	ColorRGB color(255, 255, 255, 200);
+	
+	// GROOVE &
+	dtc.SetFontColor(color);
+	dtcs.Draw(10, 100, "GROOVE");
+	dtc.SetAlignment(TextAlign::LEFT);
+	dtc.SetStringAdjust(TextureAdjust::NONE);
+	dtc.SetLetterSpace(0);
+	RectF textArea = {127, 92, 250, 150};
+	dtc.DrawInRect(textArea, 0, -1, 40, "%5.1f %%", groove);
+
+	
+
+	// GROOVE BAR
+	dmng.DrawRectFrame(10, 80, 500, 14, ColorRGB(255, 255, 255, 150), 1.0f);
+	if (groove > 100.0) groove = 100.0;
+	dmng.DrawRect(10, 80, groove*5, 12, ColorRGB(255, 255, 255, 150));
+	
 
 	//スコア表示
-	dtc.Draw(1530, 103, 28, 0, dtc.ConvertFromRGBA(255, 255, 255, 200), "SCORE");
-	dtc.Draw(1630, 85, 60, 4, dtc.ConvertFromRGBA(255, 255, 255, 200), "%7.0f", score);
+	
+	dtcs.SetFontColor(ColorRGB(255, 255, 255, 200));
+	dtcs.Draw(1520, 103, "SCORE");
+	dtc.SetLetterSpace(4);
+	dtc.SetFontColor(ColorRGB(255, 255, 255, 200));
+	dtc.SetAlignment(TextAlign::RIGHT);
+	textArea = {1620, 85, 1880, 285};
+	dtc.DrawInRect(textArea, "%7.0f", score);
+	dtc.SetLetterSpace(0);
 
 	// レベル表示
-	df.noFill();
-	df.stroke(255, 255, 255, 100);
-	RECT textArea;
+	
+	textArea;
 	char str[15];
 	switch (bms[musicID].GetStoredDataKind()) {
 		case DIFF_ELEMENTARY:	strcpy(str, "Elementary"); break;
@@ -1414,30 +1385,36 @@ int CGame::RunPlayMusicMode(long musicID, bool demo) {
 	textArea.top	= 1040;
 	textArea.left	= 1155;
 	textArea.right	= 1400;
-	textArea.bottom	= 1080;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dtc.DrawInRect(&textArea, 38, 0, TEXTALIGN_LEFT|TEXTSCALE_NONE, dtc.ConvertFromRGBA(255, 255, 255, 200), "%s", str);	// 難易度文字列
+	textArea.bottom	= backbufferHeight;
+	dtc.SetAlignment(TextAlign::LEFT);
+	dtc.SetFontColor(ColorRGB(255, 255, 255, 200));
+	dtc.DrawInRect(textArea, 0, -1, 38, "%s", str);	// 難易度文字列
+
 	textArea.left	= 1400;
 	textArea.top	= 1056;
 	textArea.right	= 1450;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dtcs.DrawInRect(&textArea, 19, 0, TEXTALIGN_LEFT|TEXTSCALE_NONE, dtc.ConvertFromRGBA(255, 255, 255, 200), "LEVEL");
+	dtc.SetAlignment(TextAlign::LEFT);
+	dtcs.SetFontColor(ColorRGB(255, 255, 255, 200));
+	dtcs.DrawInRect(textArea, 0, -1, 19, "LEVEL");
+
 	textArea.top	= 1040;
 	textArea.left	= 1450;
 	textArea.right	= 1520;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dtc.DrawInRect(&textArea, 38, 0, TEXTALIGN_LEFT|TEXTSCALE_NONE, dtc.ConvertFromRGBA(255, 255, 255, 200), "%2d", h->iPlaylevel[(int)(bms[musicID].GetStoredDataKind())]);
+	dtc.DrawInRect(textArea, 0, -1, 38, "%2d", h->iPlaylevel[(int)(bms[musicID].GetStoredDataKind())]);
 
 	// 曲名表示
 	textArea.left	= 1520;
 	textArea.right	= 1900;
 	textArea.top	= 1042;
-	textArea.bottom	= 1080;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dty.DrawInRect(TEXT_MUSICTITLE00+musicID, &textArea, 38, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(255, 255, 255, 200));
+	textArea.bottom	= backbufferHeight;
+	dty.SetFontColor(ColorRGB(255, 255, 255, 200));
+	dty.SetAlignment(TextAlign::LEFT);
+	wchar_t  wstr[256];
+	mbstowcs(wstr, h->mTitle, 256);
+	dty.DrawInRect(textArea, 0, -1, 38, L"%ls", wstr);
 
 
-	dd.DrawEnd();
+	dmng.DrawEnd();
 
 	// 継続
 	return 0;
@@ -1457,7 +1434,7 @@ bool CGame::InitMusicSelectionMode() {
 	ZeroMemory(bOnVirtualKey, sizeof(bOnVirtualKey));
 
 	// 背景を白に設定
-	dd.SetBackColor(0xffffff);
+	DXDrawManager::GetInstance().SetBackGroundColor(0xffffff);
 
 
 	return TRUE;
@@ -1472,10 +1449,7 @@ int CGame::RunMusicSelectionMode() {
 
 
 	// 開始時から経過した時間を算出
-	//LARGE_INTEGER li;
-	//QueryPerformanceCounter(&li);
-	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
-
+	
 	dElapsedTime = hptimer.GetTime();
 
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -1552,56 +1526,39 @@ int CGame::RunMusicSelectionMode() {
 	}
 
 
-
-	////////////////////////////////////////////////////////////////////////////////////
-	// デバイスロストチェック(フルスクリーン時にALT+TABを押した場合など)
-	// ※復帰時は内部で管理しているテクスチャは自動的にリストアされるが、
-	//   MANAGEDではない頂点バッファやテクスチャを使用している場合は、
-	//   自分でロスト＆リストア処理を行う
-	////////////////////////////////////////////////////////////////////////////////////
-	if (!dd.CheckDevice()) {
-		// ロスト中なら
-		if (!bLostDevice) {
-			// ロスト直後ならここで開放処理を行う
-			DEBUG("デバイスがロストした\n");
-
-			bLostDevice = TRUE;
-		}
-
-		// 描画せずに抜ける
-		return 1;
-	}
-
-	if (bLostDevice) {
-		// リストア直後ならここで再構築を行う
-		DEBUG("リストアされた\n");
-
-		bLostDevice = FALSE;
-	}
-
-
-
-
 	//////////////////////////////////////////////////////
 	// 描画処理
 	//////////////////////////////////////////////////////
-	dd.DrawBegin();
 
+	auto &dmng = DXDrawManager::GetInstance();
+	auto &tmng = DXTextureManager::GetInstance();
+
+	dmng.DrawBegin(true);
+
+	dmng.SetBlendMode(BLENDMODE::NORMAL);
 
 	// 背景
-	dd.SetPutStatus(TEX_BACKGND_MUSICSELECTION);
-	dd.Put(TEX_BACKGND_MUSICSELECTION, 0, 0);
+	tmng.SetDrawTexCoord(DrawTexCoord::TOP_L);
+	tmng.DrawTexture(tex_backgnd_musicselection, 0, 0);
+
 
 	// 波紋
 	for (i=0; i<ELEMENTSIZE(iRippleEffectCount); i++) {
 		if (iRippleEffectCount[i].count > 0) {
-			dd.SetPutStatus(TEX_RIPPLEGLAY, (float)iRippleEffectCount[i].count/RIPPLEEFFECTCNT, (RIPPLEEFFECTCNT - iRippleEffectCount[i].count)/(float)JUDGEEFFECTCNT, 0.0f);
-			dd.Put2(TEX_RIPPLEGLAY, iRippleEffectCount[i].x, iRippleEffectCount[i].y);
+			tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
+			tmng.DrawTexture(
+				tex_rippleglay,
+				iRippleEffectCount[i].x, iRippleEffectCount[i].y,
+				(RIPPLEEFFECTCNT - iRippleEffectCount[i].count)/(float)JUDGEEFFECTCNT,
+				(RIPPLEEFFECTCNT - iRippleEffectCount[i].count)/(float)JUDGEEFFECTCNT,
+				(float)iRippleEffectCount[i].count/RIPPLEEFFECTCNT
+			);
+
 		}
 	}
 
-
-	dtc.Draw(20, 20, 72, 0, dtc.ConvertFromRGBA(0, 0, 0, 200), "Music Selection");
+	dtc.SetFontColor(ColorRGB(0, 0, 0, 200));
+	dtc.Draw(20, 20, "Music Selection");
 
 
 	// 選択中の曲のまわりにある曲を表示
@@ -1609,10 +1566,10 @@ int CGame::RunMusicSelectionMode() {
 	const int jacketBoxSizeX = 250;
 	const int boxMargin = 50;
 	const int center = 790;
-	int jacketImgSizeX = 169;
-	int jacketImgSizeY = 169;
-	RECT textArea;
-	CDDTexPro90 *tex = NULL;
+	int jacketImgSizeX = 194;
+	int jacketImgSizeY = 194;
+	wchar_t wstr[256];
+
 
 	drawY = 270;
 	for (i=-3; i<=3; i++) {
@@ -1623,35 +1580,44 @@ int CGame::RunMusicSelectionMode() {
 		if (i>0)
 			drawX += 72;
 
-		dd.SetPutStatus(TEX_JACKETBOX_SHADE, 1.0f, 0.5f, 0.0f);
-		dd.Put(TEX_JACKETBOX_SHADE, drawX+3, drawY+3);
-		dd.SetPutStatus(TEX_JACKETBOX, 1.0f, 0.5f, 0.0f);
-		dd.Put(TEX_JACKETBOX, drawX, drawY);
+		tmng.SetDrawTexCoord(DrawTexCoord::TOP_L);
+		tmng.DrawTexture(
+			tex_jacketbox_shade,
+			drawX+3, drawY+3,
+			0.5f, 0.5f, 1.0f
+		);
+		tmng.DrawTexture(
+			tex_jacketbox,
+			drawX, drawY,
+			0.5f, 0.5f, 1.0f
+		);
+
 
 		// ジャケット表示の倍率計算
-		tex = dd.GetTexClass(TEXFILE_JACKET00+iCursor1+i);
-		float scale = 1.0f;
-		if (tex->GetWidth()/tex->GetHeight() > jacketImgSizeX/jacketImgSizeY) {
-			scale = (float)jacketImgSizeX/(float)tex->GetWidth();
-		}
-		else {
-			scale = (float)jacketImgSizeY/(float)tex->GetHeight();
-		}
-		dd.SetPutStatus(TEX_JACKET00+iCursor1+i, 1.0f, scale, 0.0f);
-		dd.Put2(TEX_JACKET00+iCursor1+i, drawX+45 + jacketImgSizeX/2, drawY+62 + jacketImgSizeY/2);
+		tmng.SetTextureAdjust(TextureAdjust::ASPECT_FIXED);
+		tmng.DrawTexture(
+			tex_jacket[iCursor1+i],
+			{(float)(drawX+32), (float)(drawY+49), (float)(drawX+32+ jacketImgSizeX), (float)(drawY+49 + jacketImgSizeY)},
+			1.0f
+		);
 
+		auto *h = bms[iCursor1+i].GetHeader();
+
+		RectF textArea;
 		textArea.left	= drawX+18;
 		textArea.right	= drawX+jacketBoxSizeX-10;
 		textArea.top	= drawY+258;
 		textArea.bottom = drawY+294;
-		df.noFill();
-		df.stroke(0, 0, 0, 100);
-		//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-		dty.DrawInRect(TEXT_MUSICTITLE00+iCursor1+i, &textArea, 28, 0, TEXTALIGN_CENTERXY|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(70, 70, 70));
+		mbstowcs(wstr, h->mTitle, 256);
+		dty.SetLetterSpace(0);
+		dty.SetAlignment(TextAlign::CENTERXY);
+		dty.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
+		dty.DrawInRect(textArea, 0, -1, 28, L"%ls", wstr);
+		
 		textArea.top	= drawY+294;
 		textArea.bottom	= drawY+324;
-		//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-		dty.DrawInRect(TEXT_MUSICARTIST00+iCursor1+i, &textArea, 24, 0, TEXTALIGN_CENTERXY|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(70, 70, 70));
+		mbstowcs(wstr, h->mArtist, 256);
+		dty.DrawInRect(textArea, 0, -1, 24, L"%ls", wstr);
 	}
 
 
@@ -1659,40 +1625,45 @@ int CGame::RunMusicSelectionMode() {
 	// 選択中の曲を表示
 	drawX = 802;
 	drawY = 240;
-	LPBMSHEADER h = bms[iCursor1].GetHeader();
-	dd.SetPutStatus(TEX_JACKETBOX_SHADE, 1.0f, 0.6f, 0.0f);
-	dd.Put(TEX_JACKETBOX_SHADE, drawX+6, drawY+6);
-	dd.SetPutStatus(TEX_JACKETBOX, 1.0f, 0.6f, 0.0f);
-	dd.Put(TEX_JACKETBOX, drawX, drawY);
+	auto *h = bms[iCursor1].GetHeader();
+	tmng.DrawTexture(
+		tex_jacketbox_shade,
+		drawX+6, drawY+6,
+		0.6f, 0.6f, 1.0f
+	);
+	tmng.DrawTexture(
+		tex_jacketbox,
+		drawX, drawY,
+		0.6f, 0.6f, 1.0f
+	);
+
 
 	// ジャケット表示時の倍率計算
 	float scale = 1.0f;
-	jacketImgSizeX = 201;
-	jacketImgSizeY = 201;
-	tex = dd.GetTexClass(TEXFILE_JACKET00+iCursor1);
-	if (tex->GetWidth()/tex->GetHeight() > jacketImgSizeX/jacketImgSizeY) {
-		scale = (float)jacketImgSizeX/(float)tex->GetWidth();
-	}
-	else {
-		scale = (float)jacketImgSizeY/(float)tex->GetHeight();
-	}
-	dd.SetPutStatus(TEX_JACKET00+iCursor1, 1.0f, scale, 0.0f);
-	dd.Put2(TEX_JACKET00+iCursor1, drawX+55 + jacketImgSizeX/2, drawY+78 + jacketImgSizeY/2);
+	jacketImgSizeX = 231;
+	jacketImgSizeY = 231;
+	tmng.SetTextureAdjust(TextureAdjust::ASPECT_FIXED);
+	tmng.DrawTexture(
+		tex_jacket[iCursor1],
+		{(float)(drawX+40), (float)(drawY+63), (float)(drawX+40 + jacketImgSizeX), (float)(drawY+63 + jacketImgSizeY)},
+		1.0f
+	);
+	tmng.SetTextureAdjust(TextureAdjust::NONE);
 
+	RectF textArea;
 	textArea.left	= drawX+20;
 	textArea.top	= drawY+314;
 	textArea.right	= drawX+290;
 	textArea.bottom = drawY+354;
-	df.noFill();
-	df.stroke(0, 0, 0, 100);
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dty.DrawInRect(TEXT_MUSICTITLE00+iCursor1, &textArea, 34, 0, TEXTALIGN_CENTERXY|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200));
+	dty.SetAlignment(TextAlign::CENTERXY);
+	dty.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
+	dty.SetFontColor(ColorRGB(0, 0, 0, 200));
+	mbstowcs(wstr, h->mTitle, 256);
+	dty.DrawInRect(textArea, 0, -1, 34, L"%ls", wstr);
 	textArea.top	= drawY+354;
 	textArea.bottom	= drawY+388;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dty.DrawInRect(TEXT_MUSICARTIST00+iCursor1, &textArea, 30, 0, TEXTALIGN_CENTERXY|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200));
-
-
+	mbstowcs(wstr, h->mArtist, 256);
+	dty.DrawInRect(textArea, 0, -1, 30, L"%ls", wstr);
 
 
 
@@ -1700,9 +1671,12 @@ int CGame::RunMusicSelectionMode() {
 	drawX = 684;
 	drawY = 680;
 
-	dd.SetPutStatus(TEX_SCOREBOX, 1.0f, 0.5f, 0.0f);
-	LPPUTOBJECT obj = dd.GetPutObject(TEX_SCOREBOX);
-	dd.Put(TEX_SCOREBOX, drawX, drawY);
+	tmng.SetTextureAdjust(TextureAdjust::NONE);
+	tmng.DrawTexture(
+		tex_scorebox,
+		drawX, drawY,
+		0.5f, 0.5f, 1.0f
+	);
 
 	// スコアボックス内のテキスト表示
 	SIZE boxInMargin;
@@ -1712,8 +1686,8 @@ int CGame::RunMusicSelectionMode() {
 	int textAreaHeight = 40;
 
 	SIZE drawAreaSize;
-	drawAreaSize.cx = obj->mSize.cx*obj->fScaleX - boxInMargin.cx*2;
-	drawAreaSize.cy = obj->mSize.cy*obj->fScaleY - boxInMargin.cy*2;
+	drawAreaSize.cx = tex_scorebox.getSize().w*0.5f - boxInMargin.cx*2;
+	drawAreaSize.cy = tex_scorebox.getSize().h*0.5f - boxInMargin.cy*2;
 	int difficultyCnt = 0;
 	for (i=0; i<4; i++) {
 		if (h->iPlaylevel[i] >= 0) difficultyCnt++;
@@ -1733,37 +1707,33 @@ int CGame::RunMusicSelectionMode() {
 			case 2: strcpy(str, "Advanced"); break;
 			case 3: strcpy(str, "Master"); break;
 		}
-		//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-		dtcs.DrawInRect(&textArea, 28, 0, TEXTALIGN_LEFT|TEXTSCALE_NONE, dtc.ConvertFromRGBA(0, 0, 0, 200), "%s", str);	// 難易度文字列
+		dtcs.SetAlignment(TextAlign::LEFT);
+		dtcs.SetFontColor(ColorRGB(0, 0, 0, 200));
+		dtcs.DrawInRect(textArea, 0, -1, 28, "%s", str);	// 難易度文字列
 		textArea.left	+= 125;
 		textArea.top	+= 30;
-		//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-		dts.DrawInRect(&textArea, 12, 0, TEXTALIGN_NONE|TEXTSCALE_NONE, dtc.ConvertFromRGBA(40, 40, 40, 200), "LEVEL");
+		dts.SetFontColor(ColorRGB(40, 40, 40, 200));
+		dts.SetAlignment(TextAlign::NONE);
+		dts.SetStringAdjust(TextureAdjust::ASPECT_FIXED);
+		dts.DrawInRect(textArea, 0, -1, 10, "LEVEL");
 		textArea.left	+= 31;
-		textArea.top	-= 36;
-		//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-		dtc.DrawInRect(&textArea, 50, 0, TEXTALIGN_NONE|TEXTSCALE_NONE, dtc.ConvertFromRGBA(20, 20, 20, 255), "%2d", h->iPlaylevel[elementCnt]);
+		textArea.top	-= 30;
+		dtc.SetFontColor(ColorRGB(20, 20, 20, 255));
+		dtc.SetAlignment(TextAlign::NONE);
+		dtc.SetStringAdjust(TextureAdjust::ASPECT_FIXED);
+		dtc.DrawInRect(textArea, 0, -1, 47, "%2d", h->iPlaylevel[elementCnt]);
 
 
 		elementCnt++;
 	}
 
 
-/*
-	dtc.Draw(0, 130, 32, 0, 0xffff0000, "pressed");
-	dtc.Draw(0, 160, 32, 0, 0xffff0000, "hold");
 
-	for (i=0; i<VIRTUALKEYCNT; i++) {
-		dtc.Draw(i*60+20+100, 100, 32, 0, 0xffff0000, "%d", i);
-		if (pressVirtualKey[i]) dtc.Draw(i*60+100, 130, 32, 0, 0xffff0000, "ON");
-		else dtc.Draw(i*60+100, 130, 32, 0, 0x3f000000, "OFF");
-
-		if (bOnVirtualKey[i]) dtc.Draw(i*60+100, 160, 32, 0, 0xffff0000, "ON");
-		else dtc.Draw(i*60+100, 160, 32, 0, 0x3f000000, "OFF");
-	}*/
+	DIMOUSESTATE ms;
+	di.GetMouse(&ms);
 
 
-	dd.DrawEnd();
+	dmng.DrawEnd();
 
 	return 1;
 }
@@ -1804,10 +1774,6 @@ int CGame::RunDifficultySelectionMode() {
 	int i, j, k;
 
 	// 開始時から経過した時間を算出
-	//LARGE_INTEGER li;
-	//QueryPerformanceCounter(&li);
-	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
-
 	dElapsedTime = hptimer.GetTime();
 
 	///////////////////////////////////////////////////////////////////////////////////////
@@ -1906,116 +1872,112 @@ int CGame::RunDifficultySelectionMode() {
 
 
 
-	////////////////////////////////////////////////////////////////////////////////////
-	// デバイスロストチェック(フルスクリーン時にALT+TABを押した場合など)
-	// ※復帰時は内部で管理しているテクスチャは自動的にリストアされるが、
-	//   MANAGEDではない頂点バッファやテクスチャを使用している場合は、
-	//   自分でロスト＆リストア処理を行う
-	////////////////////////////////////////////////////////////////////////////////////
-	if (!dd.CheckDevice()) {
-		// ロスト中なら
-		if (!bLostDevice) {
-			// ロスト直後ならここで開放処理を行う
-			DEBUG("デバイスがロストした\n");
-
-			bLostDevice = TRUE;
-		}
-
-		// 描画せずに抜ける
-		return 1;
-	}
-
-	if (bLostDevice) {
-		// リストア直後ならここで再構築を行う
-		DEBUG("リストアされた\n");
-
-		bLostDevice = FALSE;
-	}
-
-
-
-
 	//////////////////////////////////////////////////////
 	// 描画処理
 	//////////////////////////////////////////////////////
-	dd.DrawBegin();
 
+	auto &dmng = DXDrawManager::GetInstance();
+	auto &tmng = DXTextureManager::GetInstance();
+
+	dmng.DrawBegin(true);
+
+	dmng.SetBlendMode(BLENDMODE::NORMAL);
 
 	// 背景
-	dd.SetPutStatus(TEX_BACKGND_MUSICSELECTION);
-	dd.Put(TEX_BACKGND_MUSICSELECTION, 0, 0);
+	tmng.SetDrawTexCoord(DrawTexCoord::TOP_L);
+	tmng.DrawTexture(
+		tex_backgnd_musicselection,
+		0, 0
+	);
+
 
 	// 波紋
 	for (i=0; i<ELEMENTSIZE(iRippleEffectCount); i++) {
 		if (iRippleEffectCount[i].count > 0) {
-			dd.SetPutStatus(TEX_RIPPLEGLAY, (float)iRippleEffectCount[i].count/RIPPLEEFFECTCNT, (RIPPLEEFFECTCNT - iRippleEffectCount[i].count)/(float)JUDGEEFFECTCNT, 0.0f);
-			dd.Put2(TEX_RIPPLEGLAY, iRippleEffectCount[i].x, iRippleEffectCount[i].y);
+			tmng.SetDrawTexCoord(DrawTexCoord::CENTER);
+			tmng.DrawTexture(
+				tex_rippleglay,
+				iRippleEffectCount[i].x, iRippleEffectCount[i].y,
+				(RIPPLEEFFECTCNT - iRippleEffectCount[i].count)/(float)JUDGEEFFECTCNT,
+				(RIPPLEEFFECTCNT - iRippleEffectCount[i].count)/(float)JUDGEEFFECTCNT,
+				(float)iRippleEffectCount[i].count/RIPPLEEFFECTCNT
+			);
 		}
 	}
 
-
-	dtc.Draw(20, 20, 72, 0, dty.ConvertFromRGBA(0, 0, 0, 200), "Difficulty Selection");
+	dtc.SetFontColor(ColorRGB(0, 0, 0, 200));
+	dtc.Draw(20, 20, "Difficulty Selection");
 
 	//// 選択曲表示 ////
-	RECT textArea;
-	const D3DPRESENT_PARAMETERS *param = dd.GetD3DPRESENT_PARAMETERS();
-	dd.SetPutStatus(TEX_BIGJACKETBOX, 1.0f, 0.5f, 0.0f);
-	const LPPUTOBJECT objBigJacketBox = dd.GetPutObject(TEX_BIGJACKETBOX);
+	RectF textArea;
+	RECT clientRect;
+	GetClientRect(win.hWnd, &clientRect);
 
-	int drawX = param->BackBufferWidth/2 - objBigJacketBox->mSize.cx*objBigJacketBox->fScaleX/2;
+	int drawX = backbufferWidth/2 - tex_bigjacketbox.getSize().w*0.5f/2;
 	int drawY = 170;
 
 	// ジャケットボックス
-	dd.SetPutStatus(TEX_BIGJACKETBOX_SHADE, 1.0f, 0.5f, 0.0f);
-	dd.Put(TEX_BIGJACKETBOX_SHADE, drawX+4, drawY+4);
-	dd.Put(TEX_BIGJACKETBOX, drawX, drawY);
+	tmng.SetDrawTexCoord(DrawTexCoord::TOP_L);
+	tmng.DrawTexture(
+		tex_bigjacketbox_shade,
+		drawX+4, drawY+4, 
+		0.5f, 0.5f, 1.0f
+	);
+	tmng.DrawTexture(
+		tex_bigjacketbox,
+		drawX, drawY,
+		0.5f, 0.5f, 1.0f
+	);
 
 	// ジャケット
-	const int jacketImgSizeX = 205;
-	const int jacketImgSizeY = 205;
+	const int jacketImgSizeX = 235;
+	const int jacketImgSizeY = 235;
 
-	float scale = 1.0f;
-	CDDTexPro90 *tex = dd.GetTexClass(TEXFILE_JACKET00+iCursor1);
-	if (tex->GetWidth()/tex->GetHeight() > jacketImgSizeX/jacketImgSizeY) {
-		scale = (float)jacketImgSizeX/(float)tex->GetWidth();
-	}
-	else {
-		scale = (float)jacketImgSizeY/(float)tex->GetHeight();
-	}
-	dd.SetPutStatus(TEX_JACKET00+iCursor1, 1.0f, scale, 0.0f);
-	dd.Put2(TEX_JACKET00+iCursor1, drawX+47 + jacketImgSizeX/2, drawY+45 + jacketImgSizeY/2);
+	tmng.SetTextureAdjust(TextureAdjust::ASPECT_FIXED);
+	tmng.DrawTexture(
+		tex_jacket[iCursor1],
+		{(float)(drawX+32), (float)(drawY+30), (float)(drawX+32) + (float)(jacketImgSizeX), (float)(drawY+30 + jacketImgSizeY)},
+		1.0f
+	);
 
 	// 曲情報
 	char genreStr[][16] ={ "", "ORIGINAL", "VARIETY", "POPS", "GAME", "VOCALOID", "ANIME" };
 	textArea.left	= drawX + 310;
 	textArea.top	= drawY + 30;
-	textArea.right	= drawX + objBigJacketBox->mSize.cx*objBigJacketBox->fScaleX - 30;
+	textArea.right	= drawX + tex_bigjacketbox.getSize().w*0.5f - 30;
 	textArea.bottom	= textArea.top + 20;
 	for (i=0; i<BMS_MAXGENRE; i++) {
 		if (h->eGenre[i] != 0) {
-			//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-			dtc.DrawInRect(&textArea, 24, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200), "%s", genreStr[bms[iCursor1].GetHeader()->eGenre[i]]);
+			dtc.SetAlignment(TextAlign::LEFT);
+			dtc.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
+			dtc.SetFontColor(ColorRGB(0, 0, 0, 200));
+			dtc.DrawInRect(textArea, 0, -1, 24, "%s", genreStr[bms[iCursor1].GetHeader()->eGenre[i]]);
 		}
 		textArea.left += 120;
 	}
+
+	dty.SetFontColor(ColorRGB(0, 0, 0, 200));
+	dty.SetAlignment(TextAlign::LEFT);
+	dty.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
 	textArea.left	= drawX + 310;
 	textArea.top	= drawY + 70;
 	textArea.bottom	= textArea.top + 35;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dty.DrawInRect(TEXT_MUSICTITLE00+iCursor1, &textArea, 40, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 220));
+	wchar_t wstr[256];
+	mbstowcs(wstr, h->mTitle, 256);
+	dty.DrawInRect(textArea, 0, -1, 40, L"%ls", wstr);
 	textArea.left	= drawX + 320;
 	textArea.top	= drawY + 115;
 	textArea.bottom	= textArea.top + 30;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dty.DrawInRect(TEXT_MUSICARTIST00+iCursor1, &textArea, 36, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200));
+	mbstowcs(wstr, h->mArtist, 256);
+	dty.DrawInRect(textArea, 0, -1, 36, L"%ls", wstr);
 	textArea.top	= drawY + 150;
 	textArea.bottom	= textArea.top + 30;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dty.DrawInRect(TEXT_MUSICSUBTITLEA00+iCursor1, &textArea, 36, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200));
+	mbstowcs(wstr, h->mSubTitle[0], 256);
+	dty.DrawInRect(textArea, 0, -1, 36, L"%ls", wstr);
 	textArea.top	= drawY + 185;
 	textArea.bottom	= textArea.top + 30;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dty.DrawInRect(TEXT_MUSICSUBTITLEB00+iCursor1, &textArea, 36, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200));
+	mbstowcs(wstr, h->mSubTitle[1], 256);
+	dty.DrawInRect(textArea, 0, -1, 36, L"%ls", wstr);
 	textArea.left	= drawX + 390;
 	textArea.top	= drawY + 240;
 	textArea.bottom	= textArea.top + 35;
@@ -2026,12 +1988,13 @@ int CGame::RunDifficultySelectionMode() {
 		if (h->fBpmIndex[b->lData] < bpmMin) bpmMin = h->fBpmIndex[b->lData];
 		else if (h->fBpmIndex[b->lData] > bpmMax) bpmMax = h->fBpmIndex[b->lData];
 	}
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dtc.DrawInRect(&textArea, 32, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 200), "%3d", bpmMin);
+	dtc.SetAlignment(TextAlign::LEFT);
+	dtc.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
+	dtc.SetFontColor(ColorRGB(0, 0, 0, 200));
+	dtc.DrawInRect(textArea, 0, -1, 32, "%3d", bpmMin);
 	if (bpmMin != bpmMax) {
 		textArea.left = drawX + 420;
-		//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-		dtc.DrawInRect(&textArea, 32, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 200), " - %3d", bpmMax);
+		dtc.DrawInRect(textArea, 0, -1, 32, " - %3d", bpmMax);
 	}
 
 
@@ -2051,58 +2014,79 @@ int CGame::RunDifficultySelectionMode() {
 	for (i=1; i<difficultyCnt+1; i++) {
 		while (h->iPlaylevel[elementCnt] < 0) elementCnt++;		// 難易度が存在する要素まで飛ばす
 		char str[15];
+		Texture *tex_diff_p;
 		switch (elementCnt) {
-			case 0: strcpy(str, "Elementary"); break;
-			case 1: strcpy(str, "Intermediate"); break;
-			case 2: strcpy(str, "Advanced"); break;
-			case 3: strcpy(str, "Master"); break;
+			case 0: strcpy(str, "Elementary");		tex_diff_p = &tex_diffbox_elementary;	break;
+			case 1: strcpy(str, "Intermediate");	tex_diff_p = &tex_diffbox_intermediate;	break;
+			case 2: strcpy(str, "Advanced");		tex_diff_p = &tex_diffbox_advanced;		break;
+			case 3: strcpy(str, "Master");			tex_diff_p = &tex_diffbox_master;		break;
 		}
 
 		int boxX = (int)(drawX + i*(float)drawAreaSizeX/(difficultyCnt+1));
-		const LPPUTOBJECT objDiffBox = dd.GetPutObject(TEX_DIFFBOX_ELEMENTARY + elementCnt);
-		const LPPUTOBJECT objDiffBoxShade = dd.GetPutObject(TEX_DIFFBOX_SHADE);
 
 		if (elementCnt != iCursor2) {
 			boxX -= boxSizeX/2;	// 難易度ボックスの左上の座標にする
 
-			dd.SetPutStatus(TEX_DIFFBOX_SHADE, 1.0f, (float)boxSizeX/(float)objDiffBoxShade->mSize.cx, 0.0f);
-			dd.Put(TEX_DIFFBOX_SHADE, boxX+3, drawY+3);
-			dd.SetPutStatus(TEX_DIFFBOX_ELEMENTARY + elementCnt, 1.0f, (float)boxSizeX/(float)objDiffBox->mSize.cx, 0.0f);
-			dd.Put(TEX_DIFFBOX_ELEMENTARY + elementCnt, boxX, drawY);
+			tmng.SetDrawTexCoord(DrawTexCoord::TOP_L);
+			tmng.DrawTexture(
+				tex_diffbox_shade,
+				boxX+3, drawY+3,
+				(float)boxSizeX/(float)tex_diffbox_shade.getSize().w,
+				(float)boxSizeX/(float)tex_diffbox_shade.getSize().w,
+				1.0f
+			);
+
+			tmng.DrawTexture(
+				*tex_diff_p,
+				boxX, drawY,
+				(float)boxSizeX/(float)tex_diffbox_shade.getSize().w,
+				(float)boxSizeX/(float)tex_diffbox_shade.getSize().w,
+				1.0f
+			);
 
 			textArea.left	= boxX  + 17;
 			textArea.top	= drawY + 17;
-			textArea.right	= boxX + objDiffBox->mSize.cx*objDiffBox->fScaleX;
+			textArea.right	= boxX + boxSizeX;
 			textArea.bottom	= textArea.top + 40;
-			//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-			dtc.DrawInRect(&textArea, 38, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 230), "%s", str);
+			dtc.SetFontColor(ColorRGB(0, 0, 0, 230));
+			dtc.SetAlignment(TextAlign::LEFT);
+			dtc.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
+			dtc.DrawInRect(textArea, 0, -1, 38, "%s", str);
 			textArea.left	= boxX + 229;
 			textArea.top	= drawY + 25;
 			textArea.bottom	= textArea.top + 65;
-			//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-			dtc.DrawInRect(&textArea, 60, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 230), "%2d", h->iPlaylevel[elementCnt]);
+			dtc.DrawInRect(textArea, 0, -1, 60, "%2d", h->iPlaylevel[elementCnt]);
 
 		}
 		else {
 			boxX -= selectBoxSizeX/2;	// 難易度ボックスの左上の座標にする
 			const int boxY = drawY - (selectBoxSizeX-boxSizeX)/2;
+			tmng.SetDrawTexCoord(DrawTexCoord::TOP_L);
+			tmng.DrawTexture(
+				tex_diffbox_shade,
+				boxX+3, drawY+3,
+				(float)selectBoxSizeX/(float)tex_diffbox_shade.getSize().w,
+				(float)selectBoxSizeX/(float)tex_diffbox_shade.getSize().w,
+				1.0f
+			);
 
-			dd.SetPutStatus(TEX_DIFFBOX_SHADE, 1.0f, (float)selectBoxSizeX/(float)objDiffBoxShade->mSize.cx, 0.0f);
-			dd.Put(TEX_DIFFBOX_SHADE, boxX+6, boxY+6);
-			dd.SetPutStatus(TEX_DIFFBOX_ELEMENTARY + elementCnt, 1.0f, (float)selectBoxSizeX/(float)objDiffBox->mSize.cx, 0.0f);
-			dd.Put(TEX_DIFFBOX_ELEMENTARY + elementCnt, boxX, boxY);
+			tmng.DrawTexture(
+				*tex_diff_p,
+				boxX, drawY,
+				(float)selectBoxSizeX/(float)tex_diffbox_shade.getSize().w,
+				(float)selectBoxSizeX/(float)tex_diffbox_shade.getSize().w,
+				1.0f
+			);
 
 			textArea.left	= boxX + 21;
 			textArea.top	= boxY + 21;
-			textArea.right	= boxX + objDiffBox->mSize.cx*objDiffBox->fScaleX;
+			textArea.right	= boxX + selectBoxSizeX;
 			textArea.bottom	= textArea.top + 46;
-			//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-			dtc.DrawInRect(&textArea, 41, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 230), "%s", str);
+			dtc.DrawInRect(textArea, 0, -1, 41, "%s", str);
 			textArea.left	= boxX + 250;
 			textArea.top	= boxY + 25;
 			textArea.bottom	= textArea.top + 74;
-			//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-			dtc.DrawInRect(&textArea, 68, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 230), "%2d", h->iPlaylevel[elementCnt]);
+			dtc.DrawInRect(textArea, 0, -1, 68, "%2d", h->iPlaylevel[elementCnt]);
 
 		}
 
@@ -2111,13 +2095,16 @@ int CGame::RunDifficultySelectionMode() {
 
 
 	// BACK文字表示
-	SetRect(&textArea, 60, 700, 180, 750);
+	textArea = { 60, 700, 180, 750 };
+	dtc.SetAlignment(TextAlign::CENTERXY);
+	dtc.SetStringAdjust(TextureAdjust::NONE);
 	if (iCursor2 == -1) {
-		dtc.DrawInRect(&textArea, 45, 0, TEXTALIGN_CENTERXY|TEXTSCALE_NONE, dty.ConvertFromRGBA(0, 0, 0, 200), "BACK");
+		dtc.SetFontColor(ColorRGB(0, 0, 0, 200));
+		dtc.DrawInRect(textArea, 0, -1, 45, "BACK");
 	}
 	else {
-		dtc.DrawInRect(&textArea, 40, 0, TEXTALIGN_CENTERXY|TEXTSCALE_NONE, dty.ConvertFromRGBA(0, 0, 0, 100), "BACK");
-
+		dtc.SetFontColor(ColorRGB(0, 0, 0, 100));
+		dtc.DrawInRect(textArea, 0, -1, 40, "BACK");
 	}
 
 	/*if (iCursor2 == 4) {
@@ -2129,7 +2116,7 @@ int CGame::RunDifficultySelectionMode() {
 	}*/
 
 
-	dd.DrawEnd();
+	dmng.DrawEnd();
 
 	return 1;
 }
@@ -2143,7 +2130,7 @@ bool CGame::InitResultMode() {
 	ZeroMemory(bOnVirtualKey, sizeof(bOnVirtualKey));
 
 	iCursor2 = 0;
-	dd.SetBackColor(0xffffff);
+	DXDrawManager::GetInstance().SetBackGroundColor(0xffffff);
 
 	return TRUE;
 }
@@ -2158,15 +2145,11 @@ int CGame::RunResultMode() {
 
 
 	// 開始時から経過した時間を算出
-	//LARGE_INTEGER li;
-	//QueryPerformanceCounter(&li);
-	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
-
 	dElapsedTime = hptimer.GetTime();
 
 	if (dElapsedTime > 15.0) {
 		// 15秒経つと自動で画面遷移する
-		return 0;
+		//return 0;
 	}
 
 
@@ -2230,112 +2213,102 @@ int CGame::RunResultMode() {
 	}
 
 
-
-
-	////////////////////////////////////////////////////////////////////////////////////
-	// デバイスロストチェック(フルスクリーン時にALT+TABを押した場合など)
-	// ※復帰時は内部で管理しているテクスチャは自動的にリストアされるが、
-	//   MANAGEDではない頂点バッファやテクスチャを使用している場合は、
-	//   自分でロスト＆リストア処理を行う
-	////////////////////////////////////////////////////////////////////////////////////
-	if (!dd.CheckDevice()) {
-		// ロスト中なら
-		if (!bLostDevice) {
-			// ロスト直後ならここで開放処理を行う
-			DEBUG("デバイスがロストした\n");
-
-			bLostDevice = TRUE;
-		}
-
-		// 描画せずに抜ける
-		return 1;
-	}
-
-	if (bLostDevice) {
-		// リストア直後ならここで再構築を行う
-		DEBUG("リストアされた\n");
-
-		bLostDevice = FALSE;
-	}
-
-
-
-
-
 	//////////////////////////////////////////////////////
 	// 描画処理
 	//////////////////////////////////////////////////////
-	dd.DrawBegin();
 
+	auto &dmng = DXDrawManager::GetInstance();
+	auto &tmng = DXTextureManager::GetInstance();
+
+
+	dmng.DrawBegin(true);
+
+	dmng.SetBlendMode(BLENDMODE::NORMAL);
 
 	// 背景
-	dd.SetPutStatus(TEX_BACKGND_MUSICSELECTION);
-	dd.Put(TEX_BACKGND_MUSICSELECTION, 0, 0);
+	tmng.SetDrawTexCoord(DrawTexCoord::TOP_L);
+	tmng.DrawTexture(tex_backgnd_musicselection, 0, 0);
 
 
-	dtc.Draw(20, 20, 72, 0, dty.ConvertFromRGBA(0, 0, 0, 200), "Result");
+	dtc.SetFontColor(ColorRGB(0, 0, 0, 200));
+	dtc.Draw(20, 20, "Result");
 
-	df.stroke(0, 0, 0, 100);
-	df.noFill();
+	//df.stroke(0, 0, 0, 100);
+	//df.noFill();
 	//// 選択曲表示 ////
 
-	const int jacketImgSizeX = 290;
-	const int jacketImgSizeY = 290;
+	const int jacketImgSizeX = 330;
+	const int jacketImgSizeY = 330;
 	const int jacketBoxSizeX = 400;
 	int drawX = 430;
 	int drawY = 200;
-	RECT textArea;
+	RectF textArea;
 	LPBMSHEADER h = bms[iCursor1].GetHeader();
-	LPPUTOBJECT objJacketBox = dd.GetPutObject(TEX_RESULTJACKETBOX_SHADE);
 
 	// ジャケットボックス表示
-	dd.SetPutStatus(TEX_RESULTJACKETBOX_SHADE, 1.0f, (float)jacketBoxSizeX/(float)objJacketBox->mSize.cx, 0.0f);
-	dd.Put(TEX_RESULTJACKETBOX_SHADE, drawX+5, drawY+5);
-	dd.SetPutStatus(TEX_RESULTJACKETBOX, 1.0f, (float)jacketBoxSizeX/(float)objJacketBox->mSize.cx, 0.0f);
-	dd.Put(TEX_RESULTJACKETBOX, drawX, drawY);
+
+	tmng.DrawTexture(
+		tex_resultjacketbox_shade,
+		drawX+5, drawY+5,
+		(float)jacketBoxSizeX/(float)tex_resultjacketbox_shade.getSize().w,
+		(float)jacketBoxSizeX/(float)tex_resultjacketbox_shade.getSize().w,
+		1.0f
+	);
+	tmng.DrawTexture(
+		tex_resultjacketbox,
+		drawX+5, drawY+5,
+		(float)jacketBoxSizeX/(float)tex_resultjacketbox_shade.getSize().w,
+		(float)jacketBoxSizeX/(float)tex_resultjacketbox_shade.getSize().w,
+		1.0f
+	);
+
 
 	// ジャケット画像表示
-	float scale = 1.0f;
-	CDDTexPro90 *tex = dd.GetTexClass(TEXFILE_JACKET00+iCursor1);
-	if (tex->GetWidth()/tex->GetHeight() > jacketImgSizeX/jacketImgSizeY) {
-		scale = (float)jacketImgSizeX/(float)tex->GetWidth();
-	}
-	else {
-		scale = (float)jacketImgSizeY/(float)tex->GetHeight();
-	}
-	dd.SetPutStatus(TEX_JACKET00+iCursor1, 1.0f, scale, 0.0f);
-	dd.Put2(TEX_JACKET00+iCursor1, drawX+55 + jacketImgSizeX/2, drawY+51 + jacketImgSizeY/2);
+	tmng.SetTextureAdjust(TextureAdjust::ASPECT_FIXED);
+	tmng.DrawTexture(
+		tex_jacket[iCursor1],
+		{(float)(drawX+37), (float)(drawY+41), (float)(drawX+43 + jacketImgSizeX), (float)(drawY+37 + jacketImgSizeY)},
+		1.0f
+	);
 
 	// 曲情報
 	char genreStr[][16] ={ "", "ORIGINAL", "VARIETY", "POPS", "GAME", "VOCALOID", "ANIME" };
-	textArea.left	= drawX + 20;
+	textArea.left	= drawX + 35;
 	textArea.top	= drawY + 380;
 	textArea.right	= drawX + jacketBoxSizeX - 20;
 	textArea.bottom	= textArea.top + 20;
+	dtc.SetAlignment(TextAlign::LEFT);
 	for (i=0; i<BMS_MAXGENRE; i++) {
 		if (h->eGenre[i] != 0) {
-			//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-			dtc.DrawInRect(&textArea, 18, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200), "%s", genreStr[bms[iCursor1].GetHeader()->eGenre[i]]);
+			dtc.SetFontColor(ColorRGB(0, 0, 0, 200));
+			dtc.DrawInRect(textArea, 0, -1, 18, "%s", genreStr[h->eGenre[i]]);
+			textArea.left += 100;
 		}
-		textArea.left += 100;
+		
 	}
-	textArea.left	= drawX + 20;
+
+	dty.SetFontColor(ColorRGB(0, 0, 0, 220));
+	dty.SetAlignment(TextAlign::LEFT);
+	dty.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
+
+	textArea.left	= drawX + 35;
 	textArea.top	= drawY + 410;
 	textArea.bottom	= textArea.top + 35;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dty.DrawInRect(TEXT_MUSICTITLE00+iCursor1, &textArea, 40, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 220));
+	wchar_t wstr[256];
+	mbstowcs(wstr, h->mTitle, 256);
+	dty.DrawInRect(textArea, 0, -1, 40, L"%ls", wstr);
 	textArea.top	= drawY + 450;
 	textArea.bottom	= textArea.top + 25;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dty.DrawInRect(TEXT_MUSICARTIST00+iCursor1, &textArea, 36, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200));
+	mbstowcs(wstr, h->mArtist, 256);
+	dty.DrawInRect(textArea, 0, -1, 36, L"%ls", wstr);
 	textArea.top	= drawY + 480;
 	textArea.bottom	= textArea.top + 25;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dty.DrawInRect(TEXT_MUSICSUBTITLEA00+iCursor1, &textArea, 36, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200));
+	mbstowcs(wstr, h->mSubTitle[0], 256);
+	dty.DrawInRect(textArea, 0, -1, 36, L"%ls", wstr);
 	textArea.top	= drawY + 510;
 	textArea.bottom	= textArea.top + 25;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dty.DrawInRect(TEXT_MUSICSUBTITLEB00+iCursor1, &textArea, 36, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200));
+	mbstowcs(wstr, h->mSubTitle[1], 256);
+	dty.DrawInRect(textArea, 0, -1, 36, L"%ls", wstr);
 
 	// 難易度表示
 	char str[13];
@@ -2345,16 +2318,19 @@ int CGame::RunResultMode() {
 		case DIFF_ADVANCED:		strcpy(str, "Advanced"); break;
 		case DIFF_MASTER:		strcpy(str, "Master"); break;
 	}
+
+	dtc.SetFontColor(ColorRGB(0, 0, 0, 220));
+	dtc.SetAlignment(TextAlign::LEFT);
+	dtc.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
+
 	textArea.left	= drawX + 80;
-	textArea.top	= drawY + 547;
-	textArea.bottom	= textArea.top + 35;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dtc.DrawInRect(&textArea, 34, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 200), "%s", str);
+	textArea.top	= drawY + 552;
+	textArea.bottom	= textArea.top + 38;
+	dtc.DrawInRect(textArea, 0, -1, 34, "%s", str);
 	textArea.left	= drawX + 335;
 	textArea.top	= drawY + 540;
 	textArea.bottom	= textArea.top + 60;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dtc.DrawInRect(&textArea, 46, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 200), "%2d", h->iPlaylevel[(int)(bms[iCursor1].GetStoredDataKind())]);
+	dtc.DrawInRect(textArea, 0, -1, 46, "%2d", h->iPlaylevel[(int)(bms[iCursor1].GetStoredDataKind())]);
 
 
 	//// 判定結果表示 ////
@@ -2374,42 +2350,58 @@ int CGame::RunResultMode() {
 	textArea.right	= textArea.left + textAreaSizeX;
 	textArea.bottom	= textArea.top + textHeight;
 	const char judgestr[5][13] ={ "Just+", "Just", "Early/Late", "Early2/Late2", "Miss" };
+
+
+	dtc.SetFontColor(ColorRGB(0, 0, 0, 220));
+
 	for (i=0; i<5; i++) {
-		//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-		dtc.DrawInRect(&textArea, 40, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 220), "%s", judgestr[i]);
+		dtc.SetAlignment(TextAlign::LEFT);
+		dtc.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
+
+		dtc.DrawInRect(textArea, 0, -1, 40, "%s", judgestr[i]);
+
+		dtc.SetAlignment(TextAlign::RIGHT);
+		dtc.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
 		switch (i) {
-			case 0: dtc.DrawInRect(&textArea, 40, 0, TEXTALIGN_RIGHT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 220), "%3d", res->just); break;
-			case 1: dtc.DrawInRect(&textArea, 40, 0, TEXTALIGN_RIGHT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 220), "%3d", res->justE + res->justL); break;
-			case 2: dtc.DrawInRect(&textArea, 40, 0, TEXTALIGN_RIGHT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 220), "%3d/%3d", res->early, res->late); break;
-			case 3: dtc.DrawInRect(&textArea, 40, 0, TEXTALIGN_RIGHT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 220), "%3d/%3d", res->early2, res->late2); break;
-			case 4: dtc.DrawInRect(&textArea, 40, 0, TEXTALIGN_RIGHT|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 220), "%3d", res->miss); break;
+			case 0: dtc.DrawInRect(textArea, 0, -1, 40, "%3d", res->just);						break;
+			case 1: dtc.DrawInRect(textArea, 0, -1, 40, "%3d", res->justE + res->justL);		break;
+			case 2: dtc.DrawInRect(textArea, 0, -1, 40, "%3d/%3d", res->early, res->late);		break;
+			case 3: dtc.DrawInRect(textArea, 0, -1, 40, "%3d/%3d", res->early2, res->late2);	break;
+			case 4: dtc.DrawInRect(textArea, 0, -1, 40, "%3d", res->miss);						break;
 		}
 		textArea.top	= textArea.bottom;
 		textArea.bottom	= textArea.top + textHeight;
 	}
 
+
+	dtc.SetFontColor(ColorRGB(0, 0, 0, 200));
+
 	textArea.top	= drawY + 330;
 	textArea.bottom = textArea.top + 100;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dtc.DrawInRect(&textArea, 40, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200), "GROOVE");
-	dtc.DrawInRect(&textArea, 40, 0, TEXTALIGN_RIGHT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200), "%3.1f %%", groove);
+	dtc.SetAlignment(TextAlign::LEFT);
+	dtc.DrawInRect(textArea, 0, -1, 40, "GROOVE");
+	dtc.SetAlignment(TextAlign::RIGHT);
+	dtc.DrawInRect(textArea, 0, -1, 40, "%3.1f %%", groove);
 
 	textArea.top	= drawY + 460;
 	textArea.bottom	= textArea.top + 120;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dtc.DrawInRect(&textArea, 52, 0, TEXTALIGN_LEFT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200), "SCORE");
-	dtc.DrawInRect(&textArea, 52, 2, TEXTALIGN_RIGHT|TEXTSCALE_AUTOXY, dty.ConvertFromRGBA(0, 0, 0, 200), "%7.0f", score);
+	dtc.SetAlignment(TextAlign::LEFT);
+	dtc.DrawInRect(textArea, 0, -1, 52, "SCORE");
+	dtc.SetLetterSpace(2);
+	dtc.SetAlignment(TextAlign::RIGHT);
+	dtc.DrawInRect(textArea, 0, -1, 52, "%7.0f", score);
 
 
 	textArea.top	= 850;
 	textArea.left	= 850;
 	textArea.right	= 1070;
 	textArea.bottom	= 950;
-	//df.rect(textArea.left, textArea.top, textArea.right-textArea.left, textArea.bottom-textArea.top);
-	dtc.DrawInRect(&textArea, 52, 15, TEXTALIGN_CENTERXY|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 220), "END");
+	dtc.SetAlignment(TextAlign::CENTERXY);
+	dtc.SetLetterSpace(15);
+	dtc.DrawInRect(textArea, 0, -1, 52, "END");
+	dtc.SetLetterSpace(0);
 
-
-	dd.DrawEnd();
+	dmng.DrawEnd();
 
 	return 1;
 }
@@ -2432,7 +2424,7 @@ bool CGame::ExitPlayMusicMode() {
 		LPBACKMEDIA m = bms[iCursor1].GetBackMedia(i);
 		switch (m->type) {
 			case BKMEDIATYPE_IMAGE:
-				dd.DelTexture(TEXFILE_BKGNDIMAGE00);
+				//dd.DelTexture(TEXFILE_BKGNDIMAGE00);
 				break;
 			case BKMEDIATYPE_MOVIE:
 				dm.Clear();
@@ -2449,100 +2441,58 @@ bool CGame::ExitPlayMusicMode() {
 
 bool CGame::RunScreenTransition(double stime) {
 	// 開始時から経過した時間を算出
-	//LARGE_INTEGER li;
-	//QueryPerformanceCounter(&li);
-	//dElapsedTime = (double)(li.QuadPart - llStartTime) / llGlobalFreq;
-	
 	dElapsedTime = hptimer.GetTime();
 
 	if (dElapsedTime > stime) {
 		return 1;
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////
-	// デバイスロストチェック(フルスクリーン時にALT+TABを押した場合など)
-	// ※復帰時は内部で管理しているテクスチャは自動的にリストアされるが、
-	//   MANAGEDではない頂点バッファやテクスチャを使用している場合は、
-	//   自分でロスト＆リストア処理を行う
-	////////////////////////////////////////////////////////////////////////////////////
-	if (!dd.CheckDevice()) {
-		// ロスト中なら
-		if (!bLostDevice) {
-			// ロスト直後ならここで開放処理を行う
-			DEBUG("デバイスがロストした\n");
-
-			bLostDevice = TRUE;
-		}
-
-		// 描画せずに抜ける
-		return 0;
-	}
-
-	if (bLostDevice) {
-		// リストア直後ならここで再構築を行う
-		DEBUG("リストアされた\n");
-
-		bLostDevice = FALSE;
-	}
-
-
-
 	//////////////////////////////////////////////////////
 	// 描画処理
 	//////////////////////////////////////////////////////
-	dd.DrawBegin(false);
+	auto &dmng = DXDrawManager::GetInstance();
+	auto &tmng = DXTextureManager::GetInstance();
 
-	dd.SetPutStatus(TEX_BACKGND_WHITE, (dElapsedTime)/stime, 1.0f, 0.0f);
-	dd.Put(TEX_BACKGND_WHITE, 0, 0);
+	dmng.DrawBegin(false);
 
-	dd.DrawEnd();
+
+	dmng.SetBlendMode(BLENDMODE::NORMAL);
+
+	tmng.SetDrawTexCoord(DrawTexCoord::TOP_L);
+	tmng.DrawTexture(tex_backgnd_white, 0, 0);
+
+	dmng.DrawEnd();
 
 	return 0;
 }
 
 bool CGame::RunLoadingScreen() {
 
-	////////////////////////////////////////////////////////////////////////////////////
-	// デバイスロストチェック(フルスクリーン時にALT+TABを押した場合など)
-	// ※復帰時は内部で管理しているテクスチャは自動的にリストアされるが、
-	//   MANAGEDではない頂点バッファやテクスチャを使用している場合は、
-	//   自分でロスト＆リストア処理を行う
-	////////////////////////////////////////////////////////////////////////////////////
-	if (!dd.CheckDevice()) {
-		// ロスト中なら
-		if (!bLostDevice) {
-			// ロスト直後ならここで開放処理を行う
-			DEBUG("デバイスがロストした\n");
-
-			bLostDevice = TRUE;
-		}
-
-		// 描画せずに抜ける
-		return 0;
-	}
-
-	if (bLostDevice) {
-		// リストア直後ならここで再構築を行う
-		DEBUG("リストアされた\n");
-
-		bLostDevice = FALSE;
-	}
-
-
 
 	//////////////////////////////////////////////////////
 	// 描画処理
 	//////////////////////////////////////////////////////
-	dd.DrawBegin(false);
+	auto &dmng = DXDrawManager::GetInstance();
+	auto &tmng = DXTextureManager::GetInstance();
 
-	RECT textArea;
+	dmng.DrawBegin(false);
+
+	RectF textArea;
+	RECT clientRect;
+	GetClientRect(win.hWnd, &clientRect);
 	textArea.left = 0;
 	textArea.top  = 0;
-	textArea.right= 1920;
-	textArea.bottom = 1080;
-	dtc.DrawInRect(&textArea, 65, 5, TEXTALIGN_CENTERXY|TEXTSCALE_AUTOXY, dtc.ConvertFromRGBA(0, 0, 0, 200), "Now Loading...");
+	textArea.right= backbufferWidth;
+	textArea.bottom = backbufferHeight;
 
-	dd.DrawEnd();
+	dtc.SetFontColor(ColorRGB(0, 0, 0, 200));
+	dtc.SetAlignment(TextAlign::CENTERXY);
+	dtc.SetStringAdjust(TextureAdjust::ASPECT_FIXED_REDUCEONLY);
+	dtc.SetLetterSpace(5);
+	dtc.DrawInRect(textArea, 0, -1, 65, "Now Loading...");
+	dtc.SetLetterSpace(0);
+
+	dmng.DrawEnd();
 
 	return TRUE;
 }
@@ -2598,10 +2548,6 @@ bool CGame::Run(HINSTANCE hinst) {
 					eState = G_TITLE;
 
 					// 現在の時間を開始時間とする
-					//LARGE_INTEGER li;
-					//QueryPerformanceCounter(&li);
-					//llStartTime = li.QuadPart;
-
 					hptimer.Pause();
 					hptimer.Reset();
 					hptimer.Start();
@@ -2618,10 +2564,6 @@ bool CGame::Run(HINSTANCE hinst) {
 						eState = G_TITLEFADEOUT;
 
 						// 現在の時間を開始時間とする
-						//LARGE_INTEGER li;
-						//QueryPerformanceCounter(&li);
-						//llStartTime = li.QuadPart;
-
 						hptimer.Pause();
 						hptimer.Reset();
 						hptimer.Start();
@@ -2654,10 +2596,6 @@ bool CGame::Run(HINSTANCE hinst) {
 					eState = G_SELECTMUSIC;
 
 					// 現在の時間を開始時間とする
-					//LARGE_INTEGER li;
-					//QueryPerformanceCounter(&li);
-					//llStartTime = li.QuadPart;
-
 					hptimer.Pause();
 					hptimer.Reset();
 					hptimer.Start();
@@ -2693,10 +2631,6 @@ bool CGame::Run(HINSTANCE hinst) {
 						eState = G_SELECTDIFFICULTY;
 
 						// 現在の時間を開始時間とする
-						//LARGE_INTEGER li;
-						//QueryPerformanceCounter(&li);
-						//llStartTime = li.QuadPart;
-
 						hptimer.Pause();
 						hptimer.Reset();
 						hptimer.Start();
@@ -2717,9 +2651,6 @@ bool CGame::Run(HINSTANCE hinst) {
 						eState = G_SELECTDIFFFADEOUT;
 
 						// 現在の時間を開始時間とする
-						//LARGE_INTEGER li;
-						//QueryPerformanceCounter(&li);
-						//llStartTime = li.QuadPart;
 						
 						hptimer.Pause();
 						hptimer.Reset();
@@ -2779,10 +2710,6 @@ bool CGame::Run(HINSTANCE hinst) {
 						Sleep(100);		// 前処理が確実に終わるように、少しだけ待機
 
 						// 現在の時間を開始時間とする
-						//LARGE_INTEGER li;
-						//QueryPerformanceCounter(&li);
-						//llStartTime = li.QuadPart;
-
 						hptimer.Pause();
 						hptimer.Reset();
 						hptimer.Start();
@@ -2817,9 +2744,6 @@ bool CGame::Run(HINSTANCE hinst) {
 						eState = G_RESULT;
 
 						// 現在の時間を開始時間とする
-						//LARGE_INTEGER li;
-						//QueryPerformanceCounter(&li);
-						//llStartTime = li.QuadPart;
 
 						hptimer.Pause();
 						hptimer.Reset();
@@ -2985,6 +2909,4 @@ bool CGame::InputVirtualKey(bool *virtualKey, MIDIKEYSTATE *midiKey, unsigned ch
 
 	return TRUE;
 }
-
-
 
